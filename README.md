@@ -60,9 +60,14 @@ Date: 2026-09-07.
 
 Open one issue per document. Each document is a self-contained set of proposals and can be discussed independently. Reference the proposal numbers (the numbered items under "Proposed normative text" in each document) and the open questions by number.
 
-## Author
+## Author & Contact
 
-Grig Bilham, Open Spatial Lab. Co-chair, MSF Infrastructure Working Group.
+**Grig Bilham**, Open Spatial Lab  
+*Co-chair, Metaverse Standards Forum (MSF) Infrastructure Working Group*
+
+- **GitHub:** [@grigb](https://github.com/grigb)
+- **Feedback & Collaboration:** Please open an issue in this repository ([github.com/openspatials/msf-wow-completion-report/issues](https://github.com/openspatials/msf-wow-completion-report/issues)) for chapter-specific technical discussions.
+- **Working Group Inquiries:** Members of the Metaverse Standards Forum can also reach Grig directly via MSF Working Group channels and Member Portal.
 
 ## Licence
 
