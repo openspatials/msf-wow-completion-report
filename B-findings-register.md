@@ -1,6 +1,9 @@
 # Appendix B: Findings Register
 
-25 findings from the Open Spatial Lab implementation of the Web of Worlds specification. Of these, 9 carry talk priority 1 (must cover in the presentation). By category: 5 blind spots (not discussed and not specified), 11 known gaps (discussed but not specified), 9 recommendations (adopt by reference from a neighbouring standard). Every finding is treated in at least one of the ten numbered documents in the completion report set.
+
+This selected register preserves 25 historical finding identifiers across ten journey stages. The corrected findings distinguish API omissions from published architecture, local evidence from independent interoperability, and optional proposals from adopted requirements. Every row points to its treatment in the report.
+
+The earlier blind-spot/known-gap categories were derived partly from keyword thresholds. They are not retained as evidence that a topic was never discussed or never specified. Counts below describe these authored rows only, not completeness, priority or confidence.
 
 **Spec commit:** WoWAPI d39a1a0 (2026-05-21). **Row set:** 2026-09-07.
 
@@ -8,13 +11,14 @@
 
 ## How to read this table
 
-Each row records one finding from the implementation effort. "Finding" states what was found in one sentence. "Recommendation" states what the working group could do about it in one sentence. "Evidence level" names the strength of the evidence:
+Each finding states a scoped result or open question. Each recommendation is an unadopted proposal for the group. Evidence basis means:
 
-- **verified-in-code** -- the finding was confirmed by running code in Open Spatial Lab.
-- **documented** -- the finding is recorded in project documentation or specification text.
-- **inferred-from-map** -- the finding was derived from the architecture map or socket coverage analysis.
+- **source-text**: the cited specification or publication supports the scoped statement.
+- **local-checks**: retained local code, numerical or contract checks support a bounded implementation result; not a fresh browser or cross-engine test.
+- **source-and-local**: both source text and retained local evidence are relevant, with their limits in the treating chapter.
+- **review-question**: the selected corpus exposed a question; it does not establish worldwide absence.
 
-"Treated in" names the numbered document and section where the finding is discussed in full.
+The table does not use a code-read label to imply that behavior was executed. Historical identifiers remain stable even where the original conclusion has been corrected.
 
 ---
 
@@ -22,110 +26,102 @@ Each row records one finding from the implementation effort. "Finding" states wh
 
 1 finding.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-014 | The README lists URL fragment verbs (#join, #follow, #preview) as Core Requirements but defines no syntax; case sensitivity, compound fragments, and unknown-fragment handling are all ambiguous. | WoW MUST define the URL fragment grammar: case-insensitive verbs, one verb per fragment, defined aspect.id syntax, and unrecognized fragments MUST NOT be hijacked. | verified-in-code | [06-discovery-and-addressing.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/06-discovery-and-addressing.md), section "Proposed normative text" |
+| R-014 | The README names entry fragments and the whitepaper shows view.5845; case, encoding, kinds and target-failure behavior still need a common profile. | Agree a fragment profile and aspect-resolution/failure rules; case-insensitive matching is a local candidate, not established behavior. | source-and-local | [06-discovery-and-addressing.md](06-discovery-and-addressing.md), section "Proposed normative text" |
 
 ## Place it
 
 4 findings.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-001 | The specification is silent on units, extent, and up-axis; an implementer composing two worlds at different scales has no vocabulary to declare them. | WoW MUST define units (metres as default, with a scale factor), upAxis (enum: y, z), and extent on the World resource. | verified-in-code | [01-coordinate-precision-units-and-extents.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md), section "World resource spatial properties" |
-| R-002 | Shared spatial anchoring (two AR devices agreeing on where 'here' is) has zero coverage in the 102-socket architecture map: no MSF subject and no listed standard covers it. | WoW SHOULD define a spatial-anchor vocabulary or adopt the emerging WebXR Anchors Module by reference. | documented | [10-role-and-blind-spots.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md), section "Shared spatial anchors" |
-| R-013 | A World resource that declares no units, up-axis, or extent leaves every implementer guessing; a metre read as a centimetre places the asset at the wrong scale on arrival. | World MUST declare units (default: metres), upAxis (enum: y, z), and extent; Node.localTransform MUST be defined as a 16-element column-major 4x4 matrix. | verified-in-code | [01-coordinate-precision-units-and-extents.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md), section "World resource spatial properties" |
-| R-022 | A GeoPose without an explicit datum is ambiguous; two implementations could assume different reference frames and place the same world in different locations on Earth. | WoW SHOULD adopt the OGC GeoPose Basic YPR form with an explicit datum field (default: WGS84) and correct lan to lon in the same pass. | documented | [01-coordinate-precision-units-and-extents.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md), section "GeoPose (SHOULD, adopt by reference)" |
+| R-001 | The whitepaper discusses units/origins; the pinned World API does not bind local units, axes or extent. | Add optional coordinate metadata and define frame/unit conversion in a named profile; extent is optional and no renderer algorithm is mandated. | source-and-local | [01-coordinate-precision-units-and-extents.md](01-coordinate-precision-units-and-extents.md), section "Optional World coordinate metadata" |
+| R-002 | No shared-anchor discovery/localization binding was located in the reviewed WoW sources; a selected map cannot establish global absence. | Name the shared localization, permissions, lifetime and error contract; WebXR tracked anchors alone do not provide cross-device sharing. | review-question | [10-role-and-blind-spots.md](10-role-and-blind-spots.md), section "Shared spatial anchors" |
+| R-013 | The local transform array lacks a length, storage-order and frame-direction binding; existing numeric constraints still apply. | Evaluate a versioned 16-element column-major profile with explicit frames and units; required data and tighter shapes need compatibility rules. | source-and-local | [01-coordinate-precision-units-and-extents.md](01-coordinate-precision-units-and-extents.md), section "Candidate localTransform profile" |
+| R-022 | OGC Basic YPR fixes WGS-84/ENU and ellipsoidal height; the WoW lan spelling and local-frame mapping remain unbound. | Adopt Basic YPR semantics by reference, migrate lan to lon with conflict handling, and define geodetic-to-local conversion. | source-text | [01-coordinate-precision-units-and-extents.md](01-coordinate-precision-units-and-extents.md), section "GeoPose adoption by reference" |
 
 ## Compose it
 
 1 finding.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-018 | Without cross-world composition, every world is a flat island; the Open Metaverse Browser model (any node may reference a child fabric, independently verified) is the composition answer. | WoW SHOULD define a cross-world reference construct on Node, with composition rules adopted from the Open Metaverse Browser model. | verified-in-code | [08-composition-graph-schema-fixes.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md), section "5. Cross-world reference construct on Node (optional)" |
+| R-018 | The whitepaper names Data Inline (p.21) and external Node references (p.22), with Anchor/Inline lineage (p.10); the YAML lacks their shared binding. | Evaluate optional external-node profiles with resolution, frames, cycles and limits; a signed fabric is one candidate content class. | source-and-local | [08-composition-graph-schema-fixes.md](08-composition-graph-schema-fixes.md), section "5. Cross-world reference construct on Node (optional)" |
 
 ## Draw it
 
 4 findings.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-007 | The specification says nothing about physics, audio, or input; implementers cannot tell whether these are out of scope or not yet written. | WoW SHOULD explicitly state that physics, audio spatialization, and input device mapping are out of scope and adopted by reference from engine-level standards. | documented | [07-assets-and-the-render-seam.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md), section "Engine-internal scope statement" |
-| R-008 | The group discusses rendering at every meeting (121 transcript hits) but the specification defines only format listing, not how a world should present an asset. | WoW SHOULD adopt glTF as the baseline required asset format (a conformant server MUST serve at least model/gltf-binary). | verified-in-code | [07-assets-and-the-render-seam.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md), section "Baseline asset format" |
-| R-017 | WoW defines the graph; RP1 Spatial Fabric defines the signed document; the seam between them is the SpatialFabricSubtree extension on Node.spatialAssetURI. | WoW SHOULD adopt the RP1 Spatial Fabric signed document (file suffix .msf) as a recognized subtree asset type alongside glTF leaves, with the SpatialFabricSubtree extension contract as the canonical seam. | verified-in-code | [07-assets-and-the-render-seam.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md), section "Transclusion contract for signed spatial documents" |
-| R-023 | Node.spatialAssetURI is an unconstrained string with no format or media type; without a baseline format, two servers could exchange a URI that neither can render. | WoW SHOULD declare glTF (model/gltf-binary) as the required baseline asset format; USD and X3D are optional. | verified-in-code | [07-assets-and-the-render-seam.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md), section "Baseline asset format" |
+| R-007 | The reviewed API does not bind physics, audio or input behavior; keyword absence alone does not decide architectural scope. | Agree which observable behaviors belong in the profile and which engine mechanisms or referenced standards remain outside it. | source-text | [07-assets-and-the-render-seam.md](07-assets-and-the-render-seam.md), section "Engine-internal scope statement" |
+| R-008 | Asset negotiation exists, but the listed formats do not guarantee a common representation for every pair of participants. | Evaluate GLB as a baseline for a defined static-mesh profile, with unsupported-feature and negotiation-failure behavior. | source-text | [07-assets-and-the-render-seam.md](07-assets-and-the-render-seam.md), section "Baseline asset format" |
+| R-017 | Open Spatial Lab composes signed .msf subtrees through a local extension with a test-anchor trust policy. | Open an optional signed-subtree track with sample payloads, byte scope, trust, execution limits and refusal cases; do not adopt one backend implicitly. | source-and-local | [07-assets-and-the-render-seam.md](07-assets-and-the-render-seam.md), section "Transclusion contract for signed spatial documents" |
+| R-023 | Node.spatialAssetURI is a string, while OpenSpatialAsset already lists negotiated representations. | Define URI-reference resolution and an agreed asset profile; do not require every spatial document to have a faithful GLB form. | source-text | [07-assets-and-the-render-seam.md](07-assets-and-the-render-seam.md), section "Baseline asset format" |
 
 ## Cross a portal
 
 2 findings.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-011 | The canonical Portal schema has id and geoPose but no destination field; no conformant portal graph can describe travel between worlds. | Portal MUST include a destination object with at minimum target_world_id (string, URI format). | verified-in-code | [02-portal-destination-and-traversal.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/02-portal-destination-and-traversal.md), section "Portal destination (MUST)" |
-| R-019 | WoW defines where a portal goes (once destination is added); OMA3 IWPS defines the handshake (may I come in); the two are complementary and neither references the other today. | WoW SHOULD adopt the IWPS Query then Teleport two-call protocol by reference for portal crossings. | verified-in-code | [02-portal-destination-and-traversal.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/02-portal-destination-and-traversal.md), section "What Open Spatial Lab built and learned" |
+| R-011 | The canonical Portal defines numeric id and geoPose without a destination member; extra fields are schema-legal. | Add optional destination with target identity/resolution rules, preserve numeric ids, and separate any stricter traversal profile. | source-and-local | [02-portal-destination-and-traversal.md](02-portal-destination-and-traversal.md), section "Optional Portal destination" |
+| R-019 | IWPS offers a possible crossing reference; the local two-call study uses demo-native fields and declares no IWPS conformance. | Evaluate the exact IWPS version, mandatory fields and security profile before adopting it; test independent endpoints and failure cases. | source-and-local | [02-portal-destination-and-traversal.md](02-portal-destination-and-traversal.md), section "What Open Spatial Lab built and learned" |
 
 ## Carry yourself across
 
 2 findings.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-020 | A user's avatar must be portable and verifiable; the WoW User resource defines the slot; Universal Manifest defines the signed envelope. | WoW SHOULD adopt Universal Manifest as the signing envelope for user identity on the User resource. | verified-in-code | [03-portable-user-state-and-identity.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md), section "Proposed normative text" |
-| R-021 | User identity that is only a server-local integer cannot survive a portal crossing; a DID bound to a key makes identity portable and verifiable without a central authority. | WoW SHOULD adopt W3C DID as the user identifier format and Universal Manifest's Ed25519/JCS-RFC8785 as the signature profile. | verified-in-code | [03-portable-user-state-and-identity.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md), section "Proposed normative text" |
+| R-020 | The User and manifest resources carry avatar information; a signed assertion protects bytes but does not establish admission or asset rights. | Evaluate an optional portable assertion profile with explicit issuer trust, holder control, disclosure and destination policy. | source-and-local | [03-portable-user-state-and-identity.md](03-portable-user-state-and-identity.md), section "Proposed normative text" |
+| R-021 | A local numeric id needs cross-world identity mapping; a key-based identifier alone does not prove a person, age or current holder control. | Preserve canonical numeric ids and evaluate optional identity references plus a defined signature/assurance profile. | source-and-local | [03-portable-user-state-and-identity.md](03-portable-user-state-and-identity.md), section "Proposed normative text" |
 
 ## Be there together
 
 2 findings.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-012 | The specification defines a presence object (three strings: avatar, navigation, gravity) and user counters on the World resource but no wire protocol for real-time events. | WoW SHOULD define a WebSocket or SSE endpoint for real-time events: user_join, user_depart, node_update, portal_activate at minimum. | verified-in-code | [05-presence-live-sync-and-persistence.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md), section "Real-time event channel" |
-| R-024 | The README names the entry verbs join, follow, and preview, but the wire contract for these verbs does not exist. | WoW SHOULD define session lifecycle semantics (join, follow, preview, depart) with explicit state transitions and reference TeleportXR's session vocabulary. | verified-in-code | [05-presence-live-sync-and-persistence.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md), section "Session lifecycle semantics" |
+| R-012 | World has presence metadata and user counters, but the reviewed API lacks a shared live-event and recovery binding. | Use the proposed vocabulary user_joined, user_left, node_created, node_updated and node_deleted; also agree transport, payloads, revisions, deduplication and reconnect/resync fixtures. | source-and-local | [05-presence-live-sync-and-persistence.md](05-presence-live-sync-and-persistence.md), section "Real-time event channel" |
+| R-024 | Join/follow/preview are named, but participation, expiry and failure behavior need a shared binding. | Bind the published no-additional-user preview intent and authorization; define source exit removal, finite tombstones, lease recovery and session authority separately from visual continuity. | source-and-local | [05-presence-live-sync-and-persistence.md](05-presence-live-sync-and-persistence.md), section "Session lifecycle semantics" |
 
 ## Trust what you see
 
 1 finding.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-006 | The WoW graph is live unsigned JSON with no signature, integrity, or provenance vocabulary; trust is discussed at meetings but codified nowhere. | WoW SHOULD define a proof-boundary declaration on every /wow response and an optional signed-envelope mechanism for world-to-world trust. | verified-in-code | [04-provenance-and-signed-subtrees.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/04-provenance-and-signed-subtrees.md), section "Proof-boundary declaration" |
+| R-006 | The world API lacks a signed-object profile; asset/manifest HEAD authorization, ETags, HTTP authentication and single sign-on already have distinct published roles. | Evaluate optional signed-content policy and labeled capability declarations; a signed flag is not a receipt, identity assurance or execution permission. | source-and-local | [04-provenance-and-signed-subtrees.md](04-provenance-and-signed-subtrees.md), section "Proof-boundary declaration" |
 
 ## Know what conforms
 
 4 findings.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-009 | The specification contains zero RFC 2119 keywords, no required properties on any schema, and an empty JSON object validates against every schema. | WoW MUST adopt RFC 2119 keywords, declare required properties on every schema, and publish a minimal conformance test corpus. | verified-in-code | [09-conformance-vocabulary-and-errata.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/09-conformance-vocabulary-and-errata.md), section "1. RFC 2119 keyword adoption" |
-| R-015 | The README says /wow/scene; the API.yaml defines /wow/spatial; two implementations that chose different paths cannot interoperate. | Errata: adjudicate and close; the README MUST be corrected to /wow/spatial or the API.yaml MUST be corrected to /wow/scene. | verified-in-code | [09-conformance-vocabulary-and-errata.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/09-conformance-vocabulary-and-errata.md), section "5. Graph path adjudication" |
-| R-016 | GeoPose.position.lan is a misspelling of longitude baked into every GeoPose occurrence; correcting it later will break interoperability with any implementation that conformed to the letter. | Errata: correct lan to lon in the next schema revision with a deprecation window; implementations SHOULD accept both during the transition. | verified-in-code | [09-conformance-vocabulary-and-errata.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/09-conformance-vocabulary-and-errata.md), section "6. GeoPose.position.lan correction" |
-| R-025 | 'Compliant with Web of Worlds' currently has no testable meaning; RFC 2119 keywords and OpenAPI required properties are settled practice. | WoW MUST adopt RFC 2119 keywords, declare required properties in every schema, and publish a conformance test corpus. | verified-in-code | [09-conformance-vocabulary-and-errata.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/09-conformance-vocabulary-and-errata.md), section "1. RFC 2119 keyword adoption" |
+| R-009 | Six resource schemas accept empty objects and reject wrong types; structural validity alone does not establish useful behavior. | Choose a behavioral profile and seed corpus, required data for its scenario, and BCP 14 wording without erasing existing constraints. | source-and-local | [09-conformance-vocabulary-and-errata.md](09-conformance-vocabulary-and-errata.md), section "1. RFC 2119 keyword adoption" |
+| R-015 | README, whitepaper p.29 and the reference schema use scene; OpenSpatialWorld/API.yaml uses spatial with a graph id. Their route and field mappings need agreement. | Choose the mapping and document aliases/version migration; adapters can bridge routes, so differing strings alone do not prove incompatibility. | source-text | [09-conformance-vocabulary-and-errata.md](09-conformance-vocabulary-and-errata.md), section "5. Graph path adjudication" |
+| R-016 | The pinned GeoPose-shaped fields use lan; an uncoordinated spelling change can leave literal consumers without longitude. | Adopt lon with an explicit legacy window and reject conflicting lan/lon values; preserve the selected OGC frame semantics. | source-text | [09-conformance-vocabulary-and-errata.md](09-conformance-vocabulary-and-errata.md), section "6. GeoPose.position.lan correction" |
+| R-025 | Existing OpenAPI constraints have testable meaning, but no sufficiently defined behavioral profile and corpus was located in the reviewed sources. | Publish versioned inputs and observable success/failure cases; shape counts and signing vectors are seed evidence, not behavioral conformance. | source-and-local | [09-conformance-vocabulary-and-errata.md](09-conformance-vocabulary-and-errata.md), section "1. RFC 2119 keyword adoption" |
 
 ## Among its neighbours
 
 4 findings.
 
-| Id | Finding | Recommendation | Evidence level | Treated in |
+| Id | Finding | Recommendation | Evidence basis | Treated in |
 |---|---|---|---|---|
-| R-003 | No portable inventory contract exists; a user who acquires an item in one world cannot carry it through a portal to another. | WoW SHOULD define a portable-inventory schema (item reference, licence, provenance) or adopt by reference from Universal Manifest. | inferred-from-map | [05-presence-live-sync-and-persistence.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md), section "Portable inventory (optional extension)" |
-| R-004 | The whitepaper names portable preferences and settings but the OpenUserManifest schema carries only name, age, and avatarAssetURI. | WoW SHOULD define a preference vocabulary on the user manifest covering at minimum accessibility settings, input preferences, and rendering quality. | documented | [05-presence-live-sync-and-persistence.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md), section "Portable preferences (optional extension)" |
-| R-005 | The whitepaper names AI integration but the API defines no agent identity, capability declaration, or agent protocol. | WoW SHOULD define an agent identity type on the User resource or explicitly defer to a future extension track with a timeline. | documented | [10-role-and-blind-spots.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md), section "AI agent identity" |
-| R-010 | Governance is the most discussed topic at every meeting (599 transcript hits across five meetings) and none of it is written down; the licence and CLA policy was stated at the 2026-08-24 meeting but no document records it. | WoW SHOULD write a governance document covering the initiative hub structure, business council charter, licence and CLA policy, and SDO liaison protocol. | documented | [10-role-and-blind-spots.md](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md), section "Governance document" |
+| R-003 | No portable-item exchange binding was located in the pinned WoW APIs; that is not a worldwide absence finding. | Evaluate optional item references, rights/provenance, consent and destination acceptance independently of portal adoption. | review-question | [05-presence-live-sync-and-persistence.md](05-presence-live-sync-and-persistence.md), section "Portable inventory (optional extension)" |
+| R-004 | The whitepaper describes preferences/settings; the pinned manifest schema has name, age and avatarAssetURI without that vocabulary. | Evaluate optional preferences with disclosure, supported-setting and observable-behavior rules; data transfer alone is not accessibility conformance. | source-text | [05-presence-live-sync-and-persistence.md](05-presence-live-sync-and-persistence.md), section "Portable preferences (optional extension)" |
+| R-005 | The whitepaper describes common human/AI access; the pinned API lacks a dedicated actor/delegation/permission binding. | Evaluate optional actor declarations separately from trusted identity and granted capabilities, or reference a chosen authorization profile. | source-text | [10-role-and-blind-spots.md](10-role-and-blind-spots.md), section "Software-agent declarations" |
+| R-010 | Keyword counts do not prove discussion frequency or absence of governance documents; the whitepaper already describes an adoption path. | Locate authoritative governance/contribution/license/liaison documents first, then ask the responsible group to fill confirmed gaps. | review-question | [10-role-and-blind-spots.md](10-role-and-blind-spots.md), section "Governance document references" |
 
 ---
 
-## Counts
+## Inventory counts
 
 **Total findings:** 25
-
-**By category:**
-
-- blind-spot: 5
-- known-gap: 11
-- recommendation: 9
-
-**Talk priority 1 (must cover):** 9
 
 **By stage:**
 
@@ -146,16 +142,14 @@ Each row records one finding from the implementation effort. "Finding" states wh
 
 ## Sources
 
-- WoWAPI repository at commit d39a1a0 (2026-05-21)
-- Open Spatial Lab findings register (25 rows, 2026-09-07)
-- The socket map of the MSF infrastructure architecture (102 sockets); each socket names an interop surface, the Web of Worlds claim, and the covering standards (summarized in document 10)
-- The discussion-evidence table (12 topics across five recorded meetings); transcript hit counts, API, README, and whitepaper hits, and classification
-- The published-positions register (document 11); each declaration classified as specified, named only, or aspiration
-- The completion map (73 rows); see Appendix A
-- The ten numbered documents in the completion report set
+- [Linked Spatial Experiences: The Web of Worlds, April 2, 2025](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/): published units, preview, authorization and aspect intent.
 
----
+- [WoWAPI at d39a1a0](https://github.com/WebOfWorlds/WoWAPI/tree/d39a1a0/specification), checked September 7, 2026.
+- [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf), with printed-page provenance in the linked chapters.
+- [OGC GeoPose 1.0](https://docs.ogc.org/is/21-056r11/21-056r11.html), [OpenAPI 3.0.4](https://spec.openapis.org/oas/v3.0.4.html) and [W3C Verifiable Credentials 2.0 trust model](https://www.w3.org/TR/vc-data-model-2.0/#trust-model).
+- Retained Open Spatial Lab findings, implementation sources and local receipts, September 7, 2026. Public reproduction of the exact local bytes is not established. The treating chapters state each proof class and its limits.
+- The selected infrastructure map and topic-keyword inventory are discovery aids; they do not establish worldwide absence, discussion frequency or completeness. [Chapter 11](11-published-positions-and-current-state.md) handles the separate publication comparison; [Appendix A](A-completion-map.md) preserves 73 selected surface records.
 
 ## Change log
 
-- 2026-09-07: first public draft, verified twice.
+- 2026-09-07: corrected all 25 historical findings and their evidence basis; removed keyword-derived absence categories and updated treating-section links without renumbering records.

@@ -1,17 +1,17 @@
 # Provenance and Signed Subtrees
 
-The Web of Worlds specification defines a live composition graph of worlds, nodes, portals, users, and views, but it contains no vocabulary for proving that any of those objects are genuine. Every response is unsigned JSON. There is no proof boundary, no signature profile, no verification requirement, and no extension point where an implementation could carry trust metadata alongside canonical fields. A conformant client today cannot distinguish a verified world from one that has been tampered with in transit, and a conformant server cannot declare which of its own claims it has actually earned.
+WoWAPI 0.0.1 defines resources and a composition graph, but its OpenSpatialWorld API does not define durable signed-object provenance or a signed-subtree execution profile. Its object schemas already permit extra properties. The whitepaper discusses existing web authentication/encryption, the asset README names HTTP authentication and single sign-on, and both asset and manifest APIs authorize resource access; neither should be erased by a broader claim that the architecture has no trust mechanisms.
 
-Open Spatial Lab addressed this by adding four mechanisms, each labeled as a non-canonical extension: a ProofBoundary schema on every response, a fail-closed trust boundary on every navigation event, a requireVerified flag on transcluded spatial subtrees, and an allOf response composite that carries the proof boundary and an extension point alongside canonical fields. These mechanisms have been running in production code (verified in code). The 55/55 signed-subtree contract check count is documented by Open Spatial Lab but was not re-run in this verification pass (reported; confidence medium until re-run).
+Open Spatial Lab adds publisher-declared capability flags, labeled response extensions and signed-fabric verification against a configured test anchor. The fabric refusal path is useful local evidence. It must be distinguished from the portal path that logs failed manifest verification or arrival notification and can continue composition. Signature validity, capability declarations, proof receipts, identity assurance and execution permission are separate results.
 
-The working group should adopt a proof-boundary declaration on every response as a SHOULD-level requirement, define a verification model for transcluded spatial content with fail-closed as the default, require re-verification on every root-changing navigation event, and provide an additive extension mechanism on response schemas.
+The bounded ask is to open an optional signed-subtree extension track with sample payloads and refusal cases. It must name publisher trust, signed-byte scope, mutable parent transforms, execution permissions and resource limits. The following text is a proposal for that evaluation, not an adopted universal verification requirement.
 
 **Status:** Specification examined at commit d39a1a0 (WebOfWorlds/WoWAPI main, checked 2026-09-07).
 
 
 ## What the specification says today
 
-The specification is silent on provenance, trust, verification, signatures, integrity, and proof. The following searches against `specification/OpenSpatialWorld/API.yaml` (505 lines, commit d39a1a0) each returned zero results: `provenance`, `trust`, `signature`, `proof`, `verify`, `integrity`, `signed`, `ETag`, `MUST`, `SHOULD`, `SHALL` (verified). The README (`specification/OpenSpatialWorld/README.md`) returns zero results for the same terms (verified).
+The pinned OpenSpatialWorld API and README have no application-signature profile for their resources. That scoped source finding does not imply that unsigned HTTP responses lack transport integrity: HTTPS authenticates/protects the transport under its trust model, while object signatures can preserve provenance through copying and storage. OpenSpatialAsset and OpenUserManifest both define `HEAD /` for authorization and ETag checks. A 200 response grants access; 403 denies it; 404 can conceal either existence or authorization, and the descriptions instruct clients not to follow redirects. The [asset README](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/README.md#L9-L10) names HTTP authentication and modern single sign-on. These are existing access provisions, not a signed-object provenance or visitor-assurance profile.
 
 The `required` keyword appears ten times in the specification: nine on path parameters (e.g. `userId`, `viewId`, `portalId`, `spatialID`, `nodeId`) and once on a request body (PUT node, line 226). No schema property is marked required (verified).
 
@@ -31,7 +31,7 @@ The `required` keyword appears ten times in the specification: nine on path para
 
 [API.yaml lines 32-44](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L32-L44)
 
-The World schema (lines 268 onward) contains `content`, `geoPose`, `presence`, `technology`, `users`, `views`, and `portals`. No proof boundary. No extension point. No required properties.
+The World schema (lines 268 onward) contains `content`, `geoPose`, `presence`, `technology`, `users`, `views`, and `portals`. No named proof boundary or shared extension namespace; extra properties remain permitted. No required properties.
 
 **GET /wow/view/{viewId}** (lines 88-107) returns the View schema:
 
@@ -49,23 +49,22 @@ The World schema (lines 268 onward) contains `content`, `geoPose`, `presence`, `
 
 [API.yaml lines 88-107](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L88-L107)
 
-The View schema contains `id` (number) and `geoPose`. No proof boundary. No extension point.
+The View schema contains `id` (number) and `geoPose`. No named proof boundary or shared extension namespace; extra properties remain permitted.
 
-The Portal and User response schemas follow the same pattern: each returns its bare schema with no trust metadata and no extension point.
+Portal and User also return their component schemas without named trust metadata. As OpenAPI 3.0.4 defaults `additionalProperties` to true, additional response fields are schema-legal; their shared names and semantics are not defined.
 
 The Node schema (lines 471 onward) defines `spatialAssetURI` as a bare `type: string` with no `format`, no `mediaType` constraint, and no prose. A `.msf` URL in that field is not prohibited, but there is no concept of a signed or verified subtree, no verification requirement, and no trust policy.
 
 
-## What fails without it
+## What remains unbound
 
-**A client cannot tell verified content from tampered content.** Every GET response is bare JSON with no signature and no declaration of what was actually checked. If a proxy, a CDN, or a man-in-the-middle alters a World response, the client has no way to detect the change. A world that honestly lacks a capability (native TeleportXR transport, for example) looks identical to one that silently claims to have it. This matters most at portal crossings: a destination world could claim any capability to attract users, and the source world has no machine-readable signal to verify.
+**Durable object provenance.** A receiver needs to know which bytes were signed and under which publisher/trust policy if it must verify content after caching, mirroring or third-party distribution. Absence of an application signature alone does not prove a man-in-the-middle vulnerability over authenticated HTTPS.
 
-**Navigation can silently serve stale or tampered content.** When a user presses back, follows a deep link, or crosses a portal, the client fetches a new response. Without a verification step at each navigation event, content that has changed upstream (or been tampered with) is rendered without question. A history entry that points to a world whose content has been replaced since the user last visited it is silently accepted. Prefetched content that fails a later check has no mechanism to be refused.
+**Claims versus evidence.** A capability flag says what the publisher declares. Signing the flag attributes it to the signer but does not prove that a test passed or a capability works. A conformance claim needs a named profile, implementation/version and relevant receipt or attestation.
 
-**Transcluded spatial subtrees have no trust chain.** The Node schema allows `spatialAssetURI` to point to any URL, including a signed spatial document. But the specification defines no verification model for that content. A node could transclude an arbitrary spatial document with no signature check, no chain of trust, and no refusal on failure. In a composition graph where worlds include content from other origins, this is a content-injection vector: a child subtree from a compromised or malicious source would be composed and drawn without any check.
+**Content execution policy.** An authentic signed subtree can still consume excessive resources or request disallowed capabilities. Publisher verification, authorization to execute, sandboxing, recursion/cost limits and failure handling are distinct controls.
 
-**Response schemas have no extension point.** An implementation that wants to carry additional metadata (a proof boundary, session state, extension data) alongside canonical fields has no defined mechanism. The canonical schemas are flat objects with no `allOf` composition and no reserved extension namespace. An implementation must either break the schema contract or invent an ad hoc convention with no interoperability guarantee.
-
+**Extension interoperability.** Existing open objects allow extra fields. A shared namespace and profile convention can reduce collisions and tell consumers how to interpret those fields. It is not needed merely to make extensions schema-legal, and one generic bag still needs namespacing among its members.
 
 ## What Open Spatial Lab built and learned
 
@@ -73,17 +72,15 @@ The Node schema (lines 471 onward) defines `spatialAssetURI` as a bare `type: st
 
 Open Spatial Lab defined a ProofBoundary schema with four required boolean flags: `application_level_handoff`, `native_teleportxr_teleport`, `first_party_teleportxr_browser_rendering`, and `standards_conformance`. The schema is strict (`additionalProperties: false`). Every flag is required, and `standards_conformance` is set to `false` on every response in the current version (verified in code; `schema.yaml` lines 670-695).
 
-The design principle is that each flag declares a specific capability the server either has or does not have, and the server must state the truth. A flag set to `false` is not a deficiency report; it is an honesty declaration. The `standards_conformance: false` value is carried on every response precisely because the implementation has not earned that claim and will not assert it prematurely.
+Each flag is a publisher declaration of a named capability. Its value can be useful for discovery, but the boolean is not an independently checked receipt. Even a signed flag must be evaluated against evidence before being treated as an earned assurance claim.
 
-This is a labeled OSL extension (`x-osl-extension: true`). It is not granted by the specification.
+This is a labeled OSL extension (`x-osl-extension: true`). Its semantics are not defined by the pinned specification.
 
-### Fail-closed trust boundary on every navigation event (CM-051)
+### Signed-fabric refusal and the separate portal path (CM-051)
 
-Open Spatial Lab implemented fail-closed verification on every navigation event: click-to-enter, proximity commit, typed address, back/forward/up, and prefetch. A history entry is an address, not a scene; going back re-runs the full verification pipeline. Prefetched-but-unverified content is never promoted to the active scene. Verification failure produces a visible refusal page with the history intact (verified in code; `NAVIGATION-ARCHITECTURE.md` lines 188-205).
+The documented signed-fabric navigation pipeline verifies required fabric bytes before promotion and shows a refusal when that verification fails. The stated trust model is the configured test anchor, not operating-system trust or production public-key infrastructure. Navigation caching must preserve the binding between verified bytes and the active payload.
 
-Fail-open root loading was a bug (fixed by work order WO-061) and was never reintroduced. The `?verify=structured` parameter is a labeled development escape hatch, never a default, and never reachable from a link.
-
-This is a client-side behavior with no corresponding specification requirement.
+This is not a claim that every navigation check fails closed. In the actual portal controller, arrival-notification failure is logged while composition continues. Manifest-verification failure is surfaced before target promotion, but does not itself stop it. Fabric verification, user assertions and notification delivery are different paths with different policies.
 
 ### Response composites with proof boundary and extension point (CM-052, CM-054)
 
@@ -94,9 +91,9 @@ Open Spatial Lab wraps every canonical response in an `allOf` composite that add
 - **OSLUserResponse** (`schema.yaml` lines 1063-1085): `allOf[User, {proof_boundary (required), webofworlds_extension, open_user_manifest}]`.
 - **OSLPortalResponse** (`schema.yaml` lines 1098-1115): `allOf[Portal, {label, proof_boundary (required), webofworlds_extension, destination}]`.
 
-In each case, the canonical schema is preserved as the first element of the `allOf` array, and the extension members are additive. The `proof_boundary` is required on every response. This pattern keeps the canonical fields intact while providing a structured place for trust metadata and implementation-specific extensions.
+`allOf` applies every member's constraints together. Member order gives no override precedence. A compatible extension can add a required proof-boundary property for the OSL response profile, but cannot change a canonical numeric identifier to a string by putting the string constraint later. The retained probe rejected both numeric and string ids under those conflicting constraints in either order. Omitting an id still passed because neither member required it.
 
-These are labeled OSL extensions. They are not granted by the specification.
+These are labeled OSL response profiles; their semantics are not standardized. Any incompatible constraints remain a schema defect, not an override.
 
 ### Verification of transcluded spatial subtrees (CM-053)
 
@@ -106,10 +103,12 @@ The verification claim is bounded: "verified" means a valid signature chaining t
 
 The SpatialFabricSubtree also requires `unitsPerMeter`, `upAxis`, and `placement`, each with no default and a refusal on absence or unrecognized values. This is a labeled divergence from the specification (divergence D8), proposed upstream.
 
-55 signed-subtree contract checks are documented by Open Spatial Lab (reported; not re-run in this verification pass; confidence medium until re-run).
+The historical July 11 total was 29 prior checks plus 26 new checks: 16 schema/contract/vocabulary assertions and 10 discovery/transform/placeholder assertions. The scene-builder tests used no DOM, fetch, WebAssembly or renderer. These are useful contract checks, not 55 cryptographic or rendered-subtree trials, and they were not rerun for these edits.
 
 
 ## Proposed normative text
+
+These are unadopted optional-profile proposals targeting OpenAPI 3.0.4. They do not alter the base API by themselves.
 
 ### Proof-boundary declaration
 
@@ -122,39 +121,33 @@ ProofBoundary:
     standards_conformance:
       type: boolean
       description: >
-        Whether this response was produced by an implementation that has
-        passed the conformance test corpus for this endpoint.
+        Publisher-declared conformance claim. This boolean is not a
+        test receipt or independent attestation; evaluate it against
+        a named profile, implementation version and supporting evidence.
 ```
 
-Every GET response under `/wow/` SHOULD include a `proof_boundary` object declaring the implementation's verified capabilities. Rationale: a machine-readable honesty declaration lets a receiving world or client distinguish earned claims from unearned ones without out-of-band knowledge.
+An optional response profile may include `proof_boundary` to state publisher-declared capabilities. Receivers must distinguish those declarations from verified receipts or attestations. The field's historical name is retained for compatibility; it does not prove a boundary was enforced.
 
-Implementations MAY add additional boolean flags to the proof boundary beyond `standards_conformance` to declare specific capabilities. Rationale: the four-flag model Open Spatial Lab uses (application-level handoff, native TeleportXR teleport, first-party TeleportXR rendering, standards conformance) proved useful, but the minimal required set for the standard is `standards_conformance` alone.
+The set and meaning of flags remain a profile decision. The OSL four-flag shape is one local example. Requiring any flag in the base response would be a compatibility change; the schema above only constrains `standards_conformance` within a present ProofBoundary object.
 
-### Verification on navigation
+### Verification on navigation and transclusion (candidate signed-content profile)
 
-A conformant client MUST verify the cryptographic envelope (when present) on every root-changing navigation event, including back, forward, deep link, and prefetch promotion. Rationale: a history entry is an address, not a cached scene; content that changed upstream must be re-verified.
-
-A prefetched-but-unverified root MUST NOT be promoted to the active scene. Rationale: prefetch is an optimization, not an exemption from verification.
-
-Verification failure MUST produce a visible refusal with the navigation history intact, not a silent fallback to unverified content. Rationale: silent fallback to unverified content is the exact failure mode this requirement exists to prevent.
-
-### Verification of transcluded content
+For a profile requiring signed content, a client MUST validate the selected signing profile and publisher trust before activating that content. Cached validation may be reused only while it remains bound to the exact bytes and applicable trust/freshness policy. Failure of required verification MUST produce a visible refusal for that content, including during prefetch promotion and nested loading.
 
 ```yaml
-Node:
+SignedSubtreePolicy:
+  type: object
   properties:
     requireVerified:
       type: boolean
       default: true
       description: >
-        When true or absent, a transcluded spatial document referenced
-        by spatialAssetURI MUST be cryptographically verified before
-        rendering. Unverified content MUST be refused, not silently drawn.
+        Within the proposed signed-content profile, absent or true
+        requires verification under its declared publisher-trust policy.
+        This does not confer execution permission or visitor assurance.
 ```
 
-The standard SHOULD define a verification model for transcluded spatial content with fail-closed as the default. Rationale: a spatial world that draws untrusted content from another origin without verification is a content-injection vector.
-
-Implementations MAY set `requireVerified: false` as a development escape hatch. Such an implementation MUST NOT claim its subtree is verified. Rationale: the escape hatch exists for local development; it must not be reachable in production.
+Unsigned leaf assets and generic canonical nodes are not silently brought under this signed-content rule. A development `false` value cannot satisfy the signed-content profile; a deployment must not expose it as an untrusted input that bypasses required verification. The group must separately define allowed execution, resource limits, signed-byte scope and treatment of mutable parent transforms.
 
 ### Response extension mechanism
 
@@ -168,27 +161,26 @@ WorldResponse:
           $ref: "#/components/schemas/ProofBoundary"
 ```
 
-Every response schema (World, View, User, Portal) SHOULD support additive extension via `allOf` composition, preserving canonical fields in the first position. Rationale: without a defined extension point, implementations that need to carry trust metadata must break the schema contract or invent incompatible ad hoc conventions.
+A response profile may express compatible additional constraints with `allOf`. Every member applies regardless of order. The canonical object schemas already allow extra fields; the proposal supplies shared naming and semantics. Validate extensions against canonical fields instead of treating an `allOf` member as an override.
 
-An extension namespace (`webofworlds_extension` or equivalent) MAY be defined as an optional container for implementation-specific members. Rationale: a single reserved key prevents collision between independent extensions.
+An optional extension namespace such as `webofworlds_extension` can separate extension data from canonical members. Independent extension authors still need unique names or profile identifiers within that object; a single reserved container alone does not prevent all collisions.
 
 
 ## Adoption path
 
-**A minimal world that does not use signed subtrees or extensions** needs no changes. The proof boundary is SHOULD-level, and a server that omits it is non-conformant in that respect but still produces valid World, View, User, and Portal responses. A client that receives a response with no `proof_boundary` treats it as unknown provenance.
+**Existing responses.** World, View, User and Portal responses remain valid without proof-boundary metadata. Additional fields are already allowed. Optional profile adoption gives fields shared semantics; it is not permission to add fields for the first time.
 
-**A client** must: (1) parse the `proof_boundary` object when present and surface its flags (at minimum `standards_conformance`); (2) verify the cryptographic envelope on every root-changing navigation event when the response carries one, refusing on failure; (3) refuse to render transcluded content that fails verification when `requireVerified` is `true` or absent.
+**Clients.** Treat capability flags as declarations. Verify signed content when the negotiated profile requires it, report its exact publisher-trust boundary, and make separate admission and execution decisions. Do not infer real-world identity or content safety from a valid signature.
 
-**A server** must: (1) include a `proof_boundary` on every GET response under `/wow/` with at minimum `standards_conformance` set to the honest value; (2) use `allOf` composition to carry the proof boundary alongside canonical schema fields; (3) set `requireVerified` honestly on any node that transcludes a spatial document.
-
+**Servers.** Advertise supported profiles and the bytes/claims they cover. Preserve canonical field types in response composites. Attach evidence references when making a tested-conformance claim; a boolean alone is not that evidence.
 
 ## Open questions for the working group
 
-1. **Which proof-boundary flags should the standard require?** Open Spatial Lab uses four (application-level handoff, native TeleportXR teleport, first-party TeleportXR rendering, standards conformance). The minimal proposal above requires only `standards_conformance`. The working group should decide whether additional flags belong in the base standard or in an extension profile.
+1. **Which proof-boundary flags should the standard require?** Open Spatial Lab uses four (application-level handoff, native TeleportXR teleport, first-party TeleportXR rendering, standards conformance). The example above requires `standards_conformance` only inside a present ProofBoundary object; it does not require that object on every response. The working group should decide whether additional flags belong in the base standard or in an extension profile.
 
-2. **What signature profile should the standard recommend?** Open Spatial Lab uses RS256 with an x5c certificate chain to a shipped test anchor for spatial subtrees, and Ed25519 for user identity manifests. The standard needs to name at least one algorithm and trust anchor model. The test-anchor model used by Open Spatial Lab is intentionally limited and would not be appropriate for a production trust infrastructure.
+2. **What signature profile should the standard recommend?** Open Spatial Lab uses RS256 with an x5c certificate chain to a shipped test anchor for spatial subtrees, and Ed25519 for user identity manifests. A signed-content profile needs to name its algorithms and publisher-trust model. The test-anchor model used by Open Spatial Lab is intentionally limited and would not be appropriate for a production trust infrastructure.
 
-3. **Should the proof boundary be MUST or SHOULD?** A MUST requirement forces every implementation to carry honesty flags from day one. A SHOULD requirement lets minimal implementations omit them. The choice turns on how quickly the working group wants machine-readable trust to become baseline.
+3. **Should the proof boundary be MUST or SHOULD?** Should capability declarations stay in an optional profile, and which evidence should accompany an assurance claim? A required base property would need versioning and a migration rule; flags alone do not supply trust.
 
 4. **How should the extension namespace be governed?** A single `webofworlds_extension` object is simple but risks becoming a dumping ground. The working group could define a registry of named extension profiles, or define rules for vendor-prefixed extension keys.
 
@@ -197,14 +189,16 @@ An extension namespace (`webofworlds_extension` or equivalent) MAY be defined as
 
 ## Sources
 
-- `specification/OpenSpatialWorld/API.yaml` at commit d39a1a0, WebOfWorlds/WoWAPI main. [Preview](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/WebOfWorlds/WoWAPI/refs/heads/main/specification/OpenSpatialWorld/API.yaml). Lines cited: 32-44, 88-107, 268 onward, 471 onward.
-- `specification/OpenSpatialWorld/README.md` at commit d39a1a0.
-- `repo/open-spatial-lab/wow-spec/schema.yaml`: ProofBoundary (lines 670-695), SpatialFabricSubtree (lines 716-850), OSLWorldResponse (lines 1042-1062), OSLUserResponse (lines 1063-1085), OSLViewResponse (lines 1086-1097), OSLPortalResponse (lines 1098-1115).
-- `repo/open-spatial-lab/docs/NAVIGATION-ARCHITECTURE.md`: trust boundary table and re-verification semantics (lines 188-205).
-- Completion Map rows: CM-050, CM-051, CM-052, CM-053, CM-054.
-- Findings row: R-006.
-
+- [OpenSpatialWorld/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenSpatialWorld/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenUserManifest/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenSpatialAsset/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L19-L34), resource authorization and ETag checks.
+- [OpenSpatialAsset/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/README.md), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf); relevant printed pages are identified in this chapter or [chapter 10](10-role-and-blind-spots.md).
+- [OpenAPI 3.0.4 Schema Object](https://spec.openapis.org/oas/v3.0.4.html#schema-object) and [W3C Verifiable Credentials 2.0 trust model](https://www.w3.org/TR/vc-data-model-2.0/#trust-model).
+- Open Spatial Lab local source snapshot and retained evidence, checked September 7, 2026: schema.yaml and NAVIGATION-ARCHITECTURE.md, plus the signed-fabric and portal-controller paths. The July 11 contract total combines 29 prior checks and 26 additions; the scene-builder checks used no DOM, fetch, WebAssembly or renderer. Test-anchor fabric refusal is separate from the continuing portal-notification/manifest path. Public reproduction of these exact local bytes is not established.
+- [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve the historical surface/finding identifiers.
 
 ## Change log
 
-- 2026-09-07: first public draft, verified.
+- 2026-09-07: corrected source scope, proposal compatibility and evidence boundaries; updated public citations.

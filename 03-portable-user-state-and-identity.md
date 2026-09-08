@@ -1,6 +1,6 @@
 # Portable User State and Identity
 
-The Web of Worlds specification defines a User resource with four properties (id, name, AvatarURI, geoPose) and no mechanism for verifying who a user is across worlds. The standard needs three additions to make user state portable: an optional signed identity manifest on the User resource so a receiving world can verify a visitor without a shared authentication backend; an age field on User so age-gated content (already declared on World) can be enforced; and a defined default role and embodiment for visitors who enter a world via a bare URL. Each addition is specified below with proposed normative text and schema fragments. The signature profile and manifest shape are high confidence (verified against a running implementation with a passing conformance suite). The default-role proposal is medium confidence (one implementation's interpretation of a silent spec, not yet tested by a second).
+WoWAPI 0.0.1 defines a User resource and a separate OpenUserManifest resource, but does not bind signed assertions, holder control and destination admission into one cross-world assurance profile. The March 31, 2026 whitepaper already discusses existing web authentication/encryption and user-controlled disclosure. This chapter proposes optional portable assertions, an explicit assurance policy for age restrictions, and defined entry roles. A valid signature proves integrity of the signed bytes under a key; it does not by itself establish truthful age, real-world identity or permission to enter.
 
 **Specification examined at commit d39a1a0 (WebOfWorlds/WoWAPI main, checked 2026-09-07).**
 
@@ -18,22 +18,22 @@ The User schema occupies lines 351--380 of API.yaml. Its complete property set i
 
 No property is marked `required`. The `AvatarURI` field is a bare string with no format constraint.
 
-The WoWAPI repository also contains a separate OpenUserManifest sub-specification (`specification/OpenUserManifest/API.yaml`) that defines a UserManifest schema with name (string), age (number), and avatarAssetURI (string). The OpenSpatialWorld User schema does not reference the OpenUserManifest, and the OpenUserManifest defines no signature, identity verification, or required properties.
+The separate OpenUserManifest 0.0.1 specification uses OpenAPI 3.0.3. Its `UserManifest.content` object contains `name`, `age` and `avatarAssetURI`. `HEAD /` authorizes access to that manifest resource and checks its ETag: 200 means access allowed, other responses mean unauthorized, and redirects are not followed. These are existing resource-access semantics. They do not establish a visitor's identity, holder control, truthful age or destination admission. OpenSpatialWorld User does not reference this resource.
 
-The World schema declares `age_restriction` (number, line 276) but the User schema has no `age` field. A conformant world can declare an age restriction that no conformant user can satisfy.
+The World schema declares `age_restriction`, but OpenSpatialWorld does not bind it to a verified visitor-age assertion or to an admission procedure. The separate manifest age is a numeric claim, not age assurance by itself.
 
 The spec defines `DELETE /wow/user/{userId}` (lines 67--85, operationId `deleteUserById`) with responses 200 ("User deleted"), 400 ("Invalid user value"), and a default catch-all ("Unexpected error"). No request body, no required properties.
 
 The README Core Requirements table says visitors join a world "as new or existing user on a given device and UA" (README.md, line 11). The spec never states what role or embodiment that visitor starts in.
 
-**Terms searched with zero results across OpenSpatialWorld/API.yaml and OpenSpatialWorld/README.md:** identity (0, 0), manifest (0, 0), signature (0, 0), DID (0, 0), did:key (0, 0), Ed25519 (0, 0), consent (0, 0), portable (0, 0), credential (0, 0). The OpenSpatialWorld sub-specification is entirely silent on identity verification, portable credentials, and cryptographic signing for users. (The OpenUserManifest sub-specification in the same repository is described above.)
+**Source boundary.** The reviewed OpenSpatialWorld API and README contain no user-signature profile or holder-challenge/admission binding. Keyword absence is not absence of identity architecture: the full whitepaper discusses web authentication and selective disclosure, and OpenUserManifest already has resource authorization as described above.
 
 
 ## What fails without it
 
-**A user crossing between worlds cannot prove their identity.** When a visitor arrives from World A at World B, the receiving world sees a User object with a server-local integer id and a name string. Neither field is verifiable. World B must either trust World A's claim on faith, build a private authentication channel to World A, or treat every visitor as unknown. None of these scales. The first two create bilateral coupling between every pair of worlds; the third defeats the purpose of carrying a user identity at all.
+**No interoperable visitor-assurance binding.** A User id and name do not tell a receiver who asserted them, whether the assertion is trusted for a purpose, or whether the presenter currently controls the subject key. Worlds can use existing authentication systems, but the reviewed API does not specify how to carry and evaluate those results during crossing.
 
-**Age-gated content cannot be enforced through the OpenSpatialWorld API.** The OpenUserManifest sub-specification includes an age field on UserManifest, but the OpenSpatialWorld User schema does not reference it, so a conformant OpenSpatialWorld server has no API path to that value. A world that sets age_restriction to 18 has no conformant way to check whether a visitor meets the restriction through the OpenSpatialWorld endpoints alone (verified: API.yaml line 276 declares age_restriction; lines 351--380 contain no age property; OpenUserManifest/API.yaml defines age on UserManifest but is not referenced by the User schema).
+**An age field is not age assurance.** The separate manifest provides a place for a declared age, but neither that number nor its signature establishes its truth. A destination needs a chosen issuer/assurance policy, holder binding where required, and an admission rule. A self-declared value can support a low-assurance policy only when it is labeled as such.
 
 **A client joining a world does not know what the visitor is.** The README says a visitor joins "as new or existing user" but never says whether the visitor is embodied, what avatar they wear by default, or whether they are a spectator, a player, or something else. Two implementations could assign different default states to the same join URL, producing different visible behaviour for the same action.
 
@@ -42,22 +42,24 @@ The README Core Requirements table says visitors join a world "as new or existin
 
 Open Spatial Lab extended the User resource with three additions, each labeled as a non-canonical extension (`x-osl-extension: true`) and served alongside the canonical User properties without removing any of them.
 
-**1. OSLUserResponse and OpenUserManifest (CM-027, CM-029).** The extended GET /wow/user/{userId} response wraps the canonical User in an OSLUserResponse that adds a `proof_boundary`, a `webofworlds_extension`, and an `open_user_manifest`. The manifest carries name, age, and avatarAssetURI (matching the name in the WoW OpenUserManifest sub-specification, which differs from the OpenSpatialWorld User schema's AvatarURI). The manifest is the content that gets signed. When a signer is available, the `signature` field holds a UMSignature block; when no signer is available, it holds null, which the schema documents as "honest unsigned/unverified degradation" (source: `repo/open-spatial-lab/wow-spec/schema.yaml`, lines 959--982 and 1064--1084).
+**1. OSLUserResponse and OpenUserManifest (CM-027, CM-029).** The extended GET /wow/user/{userId} response wraps the canonical User in an OSLUserResponse that adds a `proof_boundary`, a `webofworlds_extension`, and an `open_user_manifest`. The manifest carries name, age, and avatarAssetURI (matching the name in the WoW OpenUserManifest sub-specification, which differs from the OpenSpatialWorld User schema's AvatarURI). The manifest is the content that gets signed. When a signer is available, the `signature` field holds a UMSignature block; when no signer is available, it holds null, which the schema documents as "honest unsigned/unverified degradation" (source: `schema.yaml`, lines 959--982 and 1064--1084).
 
-**2. UMSignature identity verification (CM-028).** The signature uses Ed25519 over JCS-RFC8785 (RFC 8785 JSON Canonicalization Scheme) canonical bytes, bound to a `did:key` DID URL. The schema defines six fields: algorithm (must be "Ed25519"), canonicalization (must be "JCS-RFC8785"), keyRef (a did:key DID URL), publicKeySpkiB64 (base64 SPKI DER Ed25519 public key), created (ISO 8601), and value (base64url Ed25519 signature over the canonicalized signing input). This is called "UM Signature Profile A" and is separate from the .msf RS256/x5c engine spine used for signed spatial documents (source: `repo/open-spatial-lab/wow-spec/schema.yaml`, lines 932--957). The signing suite has a passing conformance check (91 checks, 35 attack vectors resisted; reported: `repo/open-spatial-lab/docs/ecosystem/layers/universalmanifest.md`, section 4).
+**2. UMSignature byte-integrity verification (CM-028).** Profile A uses Ed25519 over JCS-RFC8785 canonical bytes and binds key resolution/consistency to a `did:key` identifier. Its schema carries algorithm, canonicalization, keyRef, publicKeySpkiB64, created and value. It is separate from the `.msf` RS256/x5c signing profile. September 7 runs passed 91 supplied signing vectors and 35 supplied adversarial/profile cases, with two input-discipline boundaries reported by the latter runner: the library does not enforce the safe-integer range, and duplicate-key rejection requires a stricter input parser. These are not already-enforced guarantees. A bounded probe verified a self-asserted age of 99 and a copied manifest, and rejected altered signed content. These results establish their signature-profile scope, not age truth, fresh holder control or a general security guarantee.
 
-**3. World-entry interpretation I10 (CM-030).** OSL interpreted a bare /w/{world} URL as a world entry that boots an embodied player role. An explicit ?role= parameter overrides this default. The interpretation follows from the README's Core Requirement that visiting a world URL means joining the world "as new or existing user," combined with the judgment that OSL's legacy inspector windows (?role=source or ?role=target) are developer surfaces and must not be the default (source: `repo/open-spatial-lab/web/wow-url.mjs`, lines 534--540).
+**3. World-entry interpretation I10 (CM-030).** OSL interpreted a bare /w/{world} URL as a world entry that boots an embodied player role. An explicit ?role= parameter overrides this default. The interpretation follows from the README's Core Requirement that visiting a world URL means joining the world "as new or existing user," combined with the judgment that OSL's legacy inspector windows (?role=source or ?role=target) are developer surfaces and must not be the default (source: `wow-url.mjs`, lines 534--540).
 
-**The claim boundary:** these are labeled non-canonical extensions verified in one implementation. They do not carry a conformance claim against the Web of Worlds specification (every OSL response includes `standards_conformance: false`). The signature suite aligns to the UniversalManifest Signature Profile A specification and has its own conformance checks, but UM itself has not been adopted by any other project in the ecosystem (reported: `repo/open-spatial-lab/docs/ecosystem/layers/universalmanifest.md`, section 2).
+**The claim boundary:** these are non-canonical local extensions, with `standards_conformance: false`. Other Universal Manifest policy modules exist, but the cited signing checks do not bind them into visitor assurance or admission. In the local portal controller, a failed manifest-verification result is logged and does not itself prevent target promotion. The signed-fabric refusal path is separate, as described in [chapter 04](04-provenance-and-signed-subtrees.md).
 
-**DELETE /wow/user/{userId} (CM-031).** OSL contracted this operation in its schema but does not serve it on the wire. A live DELETE /wow/user/1 returns 404 (verified: `repo/open-spatial-lab/web/wow-spec-coverage.mjs`, lines 256--274). This is the only defined spec operation that OSL does not serve. The gap is acknowledged and tracked.
+**DELETE /wow/user/{userId} (CM-031).** The retained Open Spatial Lab contract and coverage evidence record this operation as contracted but not served, with a local 404. This is a limit of that implementation; it is not a claim about all other implementations, which were not tested.
 
 
 ## Proposed normative text
 
-**N1. Optional signed identity manifest on User.**
+All additions below are unadopted proposals. Schema fragments target OpenAPI 3.0.4; the existing OpenUserManifest document remains OpenAPI 3.0.3. No signature choice or assurance policy is adopted by this report.
 
-A User resource SHOULD support an optional `identity_manifest` property containing a signed identity document.
+**N1. Optional portable assertion manifest on User.**
+
+A future User extension could support an optional `identity_manifest` property for portable assertions. The name is illustrative; it does not replace canonical User.id or adopt an assurance policy.
 
 ```yaml
 User:
@@ -66,9 +68,9 @@ User:
     identity_manifest:
       type: object
       description: >
-        A signed identity document for cross-world verification.
-        When present, the receiving world can verify the user's
-        identity without a shared authentication backend.
+        A signed portable assertion document. Signature verification
+        checks signed bytes and key consistency; trust in claims,
+        holder control and admission require a separate profile.
       properties:
         name:
           type: string
@@ -81,11 +83,11 @@ User:
           $ref: '#/components/schemas/IdentitySignature'
 ```
 
-Rationale: a world that receives a visitor from another world needs a way to verify the visitor's identity claim without contacting the origin world. An attached signed manifest, verified against a public key, satisfies this without bilateral coupling.
+Rationale: a signed assertion can be checked without a bilateral authentication channel, but the receiver still selects which issuers and claims to trust. A copied valid document does not prove that its presenter controls the subject key. The profile must also bind signed-byte scope, holder challenges, freshness/replay rules and selective disclosure before making an identity-assurance claim.
 
 **N2. Identity signature profile.**
 
-The standard SHOULD define a signature profile for user identity verification. The profile SHOULD use Ed25519 with JCS-RFC8785 canonicalization and a did:key identifier.
+The standard could define an optional signature profile for portable assertions. Ed25519, JCS-RFC8785 and did:key are the local candidate. The fragment below records its proposed metadata shape; schema validation alone does not verify a signature or its signed-byte scope.
 
 ```yaml
 IdentitySignature:
@@ -116,11 +118,11 @@ IdentitySignature:
       description: Base64url Ed25519 signature over the JCS-RFC8785 signing input.
 ```
 
-Rationale: Ed25519 is widely implemented, compact, and does not require a certificate authority. JCS-RFC8785 provides deterministic JSON canonicalization for signing. did:key allows offline resolution of the signer's public key.
+Rationale: these choices match the local signature candidate. JCS-RFC8785 defines a deterministic signing representation; the selected did:key method derives a key from its identifier. Neither a key format nor canonicalization establishes issuer trust.
 
 **N3. Age field on User.**
 
-User SHOULD include an optional `age` property (number) so that age-gated worlds (those declaring `age_restriction` on the World resource) can enforce their restriction.
+A profile may carry an optional declared `age`, but should first resolve whether to reuse `UserManifest.content.age`, reference a purpose-specific credential, or duplicate a value on User. If both User and manifest values appear, the assurance profile must identify the authority and handle conflict. A self-declared age does not establish eligibility for age-restricted content.
 
 ```yaml
 User:
@@ -130,11 +132,11 @@ User:
       type: number
       description: >
         The user's declared age. When a World declares age_restriction,
-        a conformant server MAY reject users whose age is below
-        the restriction.
+        an admission policy may evaluate the assertion at its
+        declared assurance level; this value does not prove age.
 ```
 
-Rationale: the World schema already declares `age_restriction`. Without a corresponding field on User, the restriction is unenforceable through the API.
+Rationale: the existing age restriction needs a defined admission policy, trusted assertion source and data-minimization rule. Adding a number only provides data representation. An over-threshold assertion may avoid disclosing exact age if the chosen profile supports it.
 
 **N4. Default role and embodiment for world entry.**
 
@@ -142,49 +144,44 @@ The specification SHOULD define the default embodiment and role of a visitor who
 
 Rationale: two implementations that assign different default roles to the same join URL will produce visibly different behaviour for the same action, breaking interoperability at the most basic interaction: entering a world.
 
-**N5. Required properties and RFC 2119 keywords on DELETE /wow/user/{userId} (optional, spec hygiene).**
+**N5. DELETE behavior clarification (optional editorial proposal).**
 
-The DELETE /wow/user/{userId} operation SHOULD declare `userId` as a required path parameter using RFC 2119 language. A conformant server MUST return 404 when the user does not exist (not 400, which the current spec returns for "Invalid user value" without defining what makes a value invalid).
-
-Rationale: the current response set (200, 400, and a default catch-all) does not distinguish a missing user from an invalid parameter. A 404 for a missing user is standard HTTP semantics.
-
+`userId` is already a required path parameter in the pinned API. No new requirement is needed to make it required. The group may clarify how missing users differ from malformed identifiers and whether deletion is idempotent; the current 200, 400 and default responses do not fully specify those cases. A proposed 404 rule would need to be distinguished from Open Spatial Lab's unsupported-route 404.
 
 ## Adoption path
 
-**For a minimal world (no portal crossings, no signed identity):** nothing changes. The User schema gains optional properties. An existing server that returns only id, name, AvatarURI, and geoPose remains valid.
+**Existing users.** Optional assertion fields do not require a minimal world to adopt signing. Existing canonical numeric ids remain valid. Missing signatures mean no claim under this signature profile; HTTPS transport and any separately authenticated session still have their own properties.
 
-**For a client that consumes identity manifests:** the client checks whether `identity_manifest` is present on a User response. When present, it verifies the signature against the keyRef. When absent, the client treats the user as unverified (the current implicit state, now made explicit). The client does not need to implement signing, only verification.
+**Receivers.** Report separate results for signed-byte integrity, issuer trust for the claim, holder control, freshness, admission and execution permission. A valid signature is input to policy, not automatic admission. The W3C Verifiable Credentials trust model likewise leaves issuer trust to the verifier.
 
-**For a server that issues identity manifests:** the server generates or stores an Ed25519 key pair per user, canonicalizes the manifest content with JCS-RFC8785, signs it, and attaches the result as `identity_manifest.signature`. The server also declares a did:key identifier for the user's public key.
+**Issuers and holders.** The whitepaper's User Digital Wallet on printed page 15 stores the user's private keys and credentials, manages consent and builds presentations. Use that as the published user-controlled custody model. A server-held key per user is a different, custodial model: it makes a server assertion and requires the receiver to establish trust in that server. Neither model makes self-asserted name or age true. Key custody, recovery, consent, holder challenges and disclosure rules remain explicit profile decisions.
 
-**For age gating:** a server that declares `age_restriction` on its World reads the `age` field from the visiting user's manifest (or from the User resource directly). If the field is absent, the server decides its own policy (admit, reject, or prompt). The spec does not mandate a specific enforcement mechanism beyond making the field available.
-
+**Age restrictions.** Define the assurance requirement and authority before enforcing a restriction. Handle absent, conflicting, expired and insufficiently assured assertions explicitly. The sample age field and signing vectors do not choose that policy.
 
 ## Open questions for the working group
 
 1. Should the identity manifest be an optional canonical field on User, or should it ride in a named extension point (as OSL implemented it)? The first is simpler for consumers; the second preserves a clean separation between the canonical schema and identity-layer additions.
 
-2. Should the spec mandate a single signature algorithm (Ed25519) or define a negotiation mechanism for future algorithms? A single algorithm is simpler and avoids downgrade attacks; a negotiation mechanism accommodates future cryptographic changes.
+2. Should the spec mandate a single signature algorithm (Ed25519) or define a negotiation mechanism for future algorithms? A fixed suite simplifies the initial profile. Negotiation needs explicit version and downgrade protection rules; a fixed algorithm alone does not establish general security.
 
-3. Should `age` be a self-declared number, or should the spec point to a verifiable age-credential format (such as a W3C Verifiable Credential with an age claim)? A self-declared number is simple but trivially falsifiable; a verifiable credential is stronger but adds a dependency.
+3. Should `age` be a self-declared number, or should the spec point to a verifiable age-credential format (such as a W3C Verifiable Credential with an age claim)? A self-declared number is simple but trivially falsifiable; a credential can support stronger assurance only under an accepted issuer, holder and verification policy.
 
 4. Should the default role for bare-URL world entry be defined in the spec or left to each world to declare? If worlds declare it, the spec needs a `default_role` field on World.
 
-5. The DELETE /wow/user/{userId} operation is defined in the spec but no known implementation serves it. Should the working group confirm this operation is intended to remain in the spec, or should it be deferred to a future extension?
+5. The DELETE /wow/user/{userId} operation is defined in the spec but the retained OSL evidence records it as unserved; other implementations were not assessed. Should the working group confirm this operation is intended to remain in the spec, or should it be deferred to a future extension?
 
 
 ## Sources
 
-- WebOfWorlds/WoWAPI, commit d39a1a0 (2026-05-21): `specification/OpenSpatialWorld/API.yaml`, `specification/OpenSpatialWorld/README.md`. Repository: https://github.com/WebOfWorlds/WoWAPI
-- Open Spatial Lab schema extensions: `repo/open-spatial-lab/wow-spec/schema.yaml` (lines 932--957, 959--982, 1064--1084)
-- Open Spatial Lab world-entry interpretation: `repo/open-spatial-lab/web/wow-url.mjs` (lines 534--540)
-- Open Spatial Lab spec-coverage audit: `repo/open-spatial-lab/web/wow-spec-coverage.mjs` (lines 256--274)
-- UniversalManifest layer document: `repo/open-spatial-lab/docs/ecosystem/layers/universalmanifest.md`
-- Open Spatial Lab working-group dossier: `repo/open-spatial-lab/docs/WORKING-GROUP-DOSSIER.md`
-- Web of Worlds Completion Map (2026-09-07): rows CM-027 through CM-031
-- Findings and Recommendations (2026-09-07): rows R-020 (avatar.body), R-021 (identity.root)
-
+- [OpenSpatialWorld/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenSpatialWorld/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenUserManifest/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf); relevant printed pages are identified in this chapter or [chapter 10](10-role-and-blind-spots.md).
+- [W3C Verifiable Credentials 2.0 trust model](https://www.w3.org/TR/vc-data-model-2.0/#trust-model).
+- [RFC 8785, JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785) and [W3C DID Core 1.0](https://www.w3.org/TR/did-core/).
+- Open Spatial Lab local source snapshot and retained evidence, checked September 7, 2026: schema.yaml, wow-url.mjs, wow-spec-coverage.mjs and um-signature-profile-a.mjs. September 7 runs passed 91 signing vectors and 35 supplied adversarial/profile cases, with two input-discipline limits. These are signature-profile checks, not identity, age or admission proof. Public reproduction of these exact local bytes is not established.
+- [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve the historical surface/finding identifiers.
 
 ## Change log
 
-2026-09-07: first public draft, verified.
+- 2026-09-07: corrected source scope, proposal compatibility and evidence boundaries; updated public citations.

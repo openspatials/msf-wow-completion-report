@@ -1,268 +1,128 @@
-# Web of Worlds among its neighbours: role and blind spots
+# Web of Worlds among its neighbors: role and open questions
 
-The Web of Worlds specification defines a spatial composition graph and a REST surface for worlds, nodes, portals, users, and views. It does not define the live-session verbs that would let two running worlds agree about anything: no crossing protocol, no presence wire contract, no coordinate vocabulary, no portable inventory, no preference envelope, no agent identity, and no governance document. Of the 102 interop sockets on the MSF Infrastructure Working Group architecture map, Web of Worlds claims 1 outright, claims 17 partially, and is silent on 84 (verified: R1 socket map, 102 rows, 2026-09-07). The composition graph is specified; the composition protocol is not.
+WoWAPI 0.0.1 defines resources, composition-graph operations and asset negotiation. Its whitepaper describes units and origins, internal and external node references, portable user information, human and AI access, and selective feature implementation. The local implementation exposed incomplete bindings for interoperable world transitions. This report offers candidate fields, profiles and tests that connect the architecture to observable behavior.
 
-Five blind spots and one known gap carry the highest cost for implementers. Each is a must-interop socket with zero coverage from any standard in the ecosystem. The proposed additions below are graded MUST (the spec cannot describe a working system without it), SHOULD (an implementer will hit a wall, but a minimal world can survive without it), or MAY (useful but genuinely optional). Every claim of "zero coverage" was verified by searching the R1 socket map for covering standards and finding none (verified: R1, 2026-09-07). Every claim of "silent" was verified by keyword search across all three API files at commit d39a1a0 (verified: grep against OpenSpatialWorld/API.yaml, OpenSpatialAsset/API.yaml, OpenUserManifest/API.yaml, 2026-09-07).
+The questions below concern coordinate agreement, shared spatial anchors, portable inventory, preferences, software-agent declarations and governance. They do not establish that no standard addresses these subjects, or that Web of Worlds should own all of them. The selected infrastructure map contains 102 rows across six reviewed subjects. Those rows describe that corpus; their empty cells are neither worldwide absence proofs nor measures of standards completion.
 
-**Status line:** Specification examined at commit d39a1a0 (WebOfWorlds/WoWAPI main, checked 2026-09-07).
+**Source boundary:** WoWAPI commit d39a1a0, checked September 7, 2026, and the March 31, 2026 whitepaper. The technical chapters distinguish published architecture, API bindings, local implementation evidence and unadopted proposals. [Chapter 11](11-published-positions-and-current-state.md) gives the publication comparison; [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve historical row identifiers.
 
+## What the sources define
 
-## What the specification says today
+**Resources and operations.** The three API documents define eight named resource schemas and sixteen operations: eleven in OpenSpatialWorld, three in OpenSpatialAsset and two in OpenUserManifest. OpenSpatialWorld already provides individual-node GET and PUT. Its six resource schemas accept empty objects but reject some wrong types. Open objects permit extra fields. These are real capabilities and constraints, even though useful behavioral conformance needs a more specific profile.
 
-The specification defines eight schemas across three API files: World, User, View, Portal, Spatial, and Node in OpenSpatialWorld; Asset in OpenSpatialAsset; and UserManifest in OpenUserManifest. It exposes sixteen operations (eleven in OpenSpatialWorld, three in OpenSpatialAsset, two in OpenUserManifest). None of the schemas declares a `required` properties array; nine of the ten `required` annotations in API.yaml are path parameters on endpoints (lines 57, 76, 98, 120, 144, 167, 198, 217, 251); the tenth (line 226) marks a request body as required. No RFC 2119 keyword (MUST, SHOULD, SHALL) appears anywhere in the three API files (verified: `grep -c` for each keyword returns 0).
+**Coordinates.** Whitepaper page 7 discusses units and origins. The pinned World schema does not bind local units, axes, handedness or extent; Node.localTransform is a number array without a length or matrix convention. OGC GeoPose Basic YPR fixes WGS-84, East-North-Up and ellipsoidal height; it is not a configurable reference-frame field. Local scene conversion still needs an explicit mapping. [Chapter 01](01-coordinate-precision-units-and-extents.md) proposes that agreement without prescribing a renderer.
 
-**On precision and coordinates:** API.yaml contains zero occurrences of `precision`, `float32`, `float64`, `units`, `scale`, `origin`, `extent`, `bounds`, `jitter`, `upAxis`, or `destination` (verified: case-insensitive grep, each term returns 0 hits). The World schema (API.yaml lines 268-349) declares content metadata (label, age_restriction, license, cost, version, duration), a geoPose, presence fields, technology fields, user counts, view counts, and portal counts. It declares no spatial units, no up-axis convention, no handedness, and no extent. Node.localTransform (API.yaml lines 488-491) is defined as `type: array, items: type: number` with no length constraint and no major-order convention.
+**Composition and delivery.** Whitepaper page 22 describes internal and external node references, and page 28 uses query/fragment delivery examples. The YAML and README provide graph and entry routes, but leave important reference-resolution and alternate-representation bindings open. Flat storage can serve embedded serialization; a reference form is an optional wire proposal. [Chapter 06](06-discovery-and-addressing.md) separates entry URLs from service bases, and [chapter 08](08-composition-graph-schema-fixes.md) preserves canonical node access.
 
-**On shared spatial anchors:** The R1 socket map lists `geo.anchor-shared` as a must-interop socket. Web of Worlds has no claim on it. Zero MSF subjects cover it. Zero other standards cover it (verified: R1 socket row for geo.anchor-shared, 2026-09-07). This is the single must-interop socket with no coverage from any source.
+**Portable information and assurance.** Whitepaper page 15 describes user-controlled disclosure and public/private manifest information. OpenUserManifest defines name, age and avatarAssetURI, plus resource-access authorization and ETag behavior. A signature profile can protect bytes, but issuer trust, holder control and destination admission are separate. [Chapter 03](03-portable-user-state-and-identity.md) keeps those distinctions explicit.
 
-**On portable inventory:** The R1 socket map lists `persist.inventory` as a must-interop socket. Web of Worlds has no claim. Five MSF subjects touch it (wow, iwps, um, omb, teleportxr) but none defines a portable inventory contract (verified: R1 socket row, 2026-09-07). The IWPS specification reserves an assets parameter but defines no schema for what it carries.
+**Software agents and implementation scope.** Whitepaper page 25 describes common human/AI access and spatial operators; page 26 describes selective feature implementation and future levels. A dedicated agent-declaration, delegation or cross-world permission binding was not located in the pinned APIs. These published aims must not be described as concepts the initiative never considered.
 
-**On user preferences:** The R1 socket map lists `persist.prefs` as a must-interop socket. Web of Worlds has no claim. Four MSF subjects touch it but none specifies a preference contract (verified: R1 socket row, 2026-09-07). The whitepaper lists "Preferences & settings" under the Digital YOU concept, but the OpenUserManifest schema defines only three properties: `name` (string), `age` (number), and `avatarAssetURI` (string) (verified: OpenUserManifest/API.yaml lines 49-60, commit d39a1a0).
+**Governance.** Whitepaper page 30 describes an X3D profile and standards-body adoption path. That is relevant organizational context. The retained meeting/topic table is a discovery aid; its keyword counts do not establish how often a topic was meaningfully discussed, how much time it received, or whether a formal document exists elsewhere. A current charter, contribution policy or liaison document should be located in the initiative's authoritative sources before asserting an organizational gap.
 
-**On AI agent identity:** The R1 socket map lists `logic.agent` as a must-interop socket. Web of Worlds has no claim. Five of the six MSF subjects touch it (wow, iwps, um, omb, teleportxr) but none defines an agent protocol (verified: R1 socket row, 2026-09-07). The whitepaper states that AI agents operate alongside humans. The three API files define no agent identity type, no capability declaration, and no agent-to-agent protocol.
+## Questions exposed by this review
 
-**On governance:** The R2 discussion-evidence report records 599 transcript hits for governance across five meetings, more than any technical topic (verified: R2, 2026-09-07). The API files contain zero governance definitions. Neither the README nor the whitepaper contains a governance reference. Five governance structures are named in meeting transcripts (initiative hub, business council, maintainer council, licence/CLA policy, SDO liaison protocol) and none is written as a formal document (verified: R3 rows gov-initiative-hub, gov-business-council, gov-maintainer-council, gov-license-cla, gov-sdo-liaison, all classified named-only).
+**Coordinate agreement.** Different units, origins and axes require a mapping; its absence can cause incorrect scale or orientation. Uniform shrinking does not recover detail lost when large absolute values are first cast to float32. Extent may aid loading and bounds; it is not a universal precision prerequisite. A profile should specify frame transforms and an error budget, leaving camera-relative coordinates, origin rebasing, normalization and other numerical choices to implementers.
 
+**Shared spatial anchors.** Two devices need a common localization result to align content in the same physical room. No complete shared-anchor discovery, localization, permissions and lifetime binding was located in the reviewed WoW sources. The WebXR Anchors Module exposes tracked anchor spaces; that alone is not a protocol for sharing and resolving the same anchor between devices. This is a scoped question, not a claim that the problem is globally unaddressed or outside all web capabilities.
 
-## What fails without it
+**Portable inventory.** No carried-item exchange binding was located in the pinned WoW APIs. A useful contract needs asset references, rights/provenance, consent and destination acceptance. Item transfer can be developed independently of Portal.destination; crossing is one consumer. The review did not establish that every world prevents users from carrying items.
 
-**Precision and coordinates.** An implementer composing two worlds at different spatial scales has no vocabulary to declare what "one unit" means. A Z-up spatial fabric mounted into a Y-up host renders upside down. A planetary-scale scene quantizes to visible jitter on float32 GPU pipelines because the world declares no extent and the renderer has no information to compute a normalization scale. Open Spatial Lab hit this when mounting a Z-up orrery fabric into the Y-up Three.js host: without declared unitsPerMeter and upAxis, the solar system rendered sideways at the wrong scale (verified: OSL implementation of SpatialFabricSubtree, CM-044 and CM-045).
+**User preferences.** The whitepaper names preferences/settings, while the pinned manifest schema does not provide a preference vocabulary. A receiving world must define supported settings and unsupported-request behavior. Data exchange alone does not prove accessible behavior. Personal information also needs a disclosure policy.
 
-**Shared spatial anchors.** Two AR devices in the same physical room cannot agree on where "here" is. Without a shared-anchor vocabulary, co-located augmented reality experiences do not align. No standard in the MSF ecosystem and no standard outside it covers this socket (documented: R1 geo.anchor-shared row shows zero coverage from any source).
+**Software-agent declarations.** A destination may need to distinguish a declared software actor, its operator and requested actions. A self-declared type or capability list is not verified identity or permission. The group should decide whether this API refers to a delegated authorization profile or only advertises descriptive metadata.
 
-**Portable inventory.** A user who acquires an item in World A and walks through a portal to World B cannot bring the item. The portal boundary has no inventory-transfer vocabulary. Every world is a walled garden for carried items (documented: R1 persist.inventory row, five MSF subjects touch the socket, none specifies a contract).
-
-**User preferences.** A user who sets accessibility preferences (text size, colour contrast, motion reduction) in one world loses them in the next. The manifest promises portable preferences and delivers three fields (documented: R3 concept-user-manifest row, gap between whitepaper claim and schema).
-
-**AI agent identity.** An implementer building an AI guide for a museum world has no way to declare the agent's permissions, distinguish it from a human user, or make its capabilities visible to other worlds. The whitepaper promises AI integration; the API defines none (documented: R3 concept-ai-integration row, aspiration classification).
-
-**Governance.** The most discussed topic across all five recorded meetings has no written output. An implementer choosing whether to build on Web of Worlds cannot find a governance charter, a contributor licence agreement, a maintainer council charter, or an SDO liaison protocol.
-
+**Governance evidence.** Contributors need usable pointers to ownership, licensing, contribution and decision rules. The next step is a scoped document lookup or a pointer from the initiative. No worldwide absence, comparative discussion-frequency claim or unresolved license blocker follows from the selected map or transcript keywords.
 
 ## What Open Spatial Lab built and learned
 
-**Precision vocabulary (labeled extension).** Open Spatial Lab added `unitsPerMeter` (number, required, no default) and `upAxis` (enum: z or y, required, no default) as required fields on the SpatialFabricSubtree schema. Both are labeled non-canonical extensions (`x-osl-extension: true`). The design decision to refuse absent values rather than default them was deliberate: a default silently reintroduces the bug the field exists to prevent. OSL also identified that the canonical World schema declares no units, scale, upAxis, handedness, or extent (CM-046). Node.localTransform is conventionally interpreted as a 16-float column-major 4x4 matrix, but this is labeled as an OSL convention, not the standard (CM-048).
+**Local transclusion metadata.** SpatialFabricSubtree requires unitsPerMeter and upAxis for its known fabric/host frames. Its unitsPerMeter means host units per fabric metre and can include intentional model reduction. It differs from the per-world local-units ratio proposed in chapter 01. Missing metadata was refused in the local contract. This supports explicit mapping; it does not prove that two fields cover arbitrary frames.
 
-**Claim boundary:** OSL proved that declaring units and up-axis on a transclusion contract prevents the sideways-render bug for its own fabric corpus. It did not prove that the vocabulary is sufficient for all coordinate systems or for non-metric unit conventions.
+**Local rendering choices.** Open Spatial Lab uses a 16-element column-major matrix convention and particular normalization, light compensation and composition backends. Precision-root transitions and the 4× hysteresis band are documented designs with assumptions. They are informative choices, not mandatory standards behavior or a proved universal minimum.
 
-**Shared anchors, portable inventory, user preferences, and AI agent identity were not attempted.** OSL is a browser-side implementation. Shared spatial anchoring requires device-level AR capabilities outside the web sandbox. Portable inventory and preferences require a cross-world contract that depends on Portal.destination, which is itself an extension. Agent identity is an organizational design problem, not an implementation task at this stage. These four gaps are recorded as blind spots, not as implementation failures.
+**Local crossing and signing evidence.** The retained Node crossing receipt contains 81 assertions from two local backends, including source-presence checks for browser code. The July 5 browser receipt is separate; the later July 11 receipt with the same name failed three stale handshake expectations. Signed-manifest vectors check byte/key consistency; signed-fabric refusal is bounded by a configured test anchor. Accepted source exit-intent removes the identified player before crossing and starts a finite tombstone; later client departure is confirmation. Lost replies, destination registration and delayed heartbeats have the distinct code-derived outcomes in chapter 02. None of these results establishes global presence exclusivity or independent cross-engine interoperability.
 
-**Governance was not attempted.** Governance codification is an organizational task outside the scope of a reference implementation. The evidence for the gap is the R2 transcript count (599 hits) and the R3 classification (all five governance structures are named-only).
+**Bindings to build or assess.** Shared multi-device anchoring, a portable inventory/preference protocol and a dedicated software-agent authorization binding were not demonstrated by the cited local work. Their feasibility, ownership and standards dependencies remain separate questions. Governance drafting is outside the implementation's scope. No keyword count proves a charter absent.
 
+## Proposed text and profile boundaries
 
-## Proposed normative text
+Every addition here is unadopted. First choose a minimal cross-implementation scenario, delegated layers, required data and observable success/failure outcomes. The five immediate asks remain limited to optional Portal.destination, a behavioral conformance profile and seed corpus, scene/spatial path mapping, lan/lon migration, and an optional signed-subtree evaluation track. Accepting them does not adopt every extension in this report.
 
-### World precision vocabulary
+### World coordinate vocabulary
 
-```yaml
-# Addition to the World schema (OpenSpatialWorld/API.yaml)
-World:
-  type: object
-  properties:
-    units:
-      type: string
-      enum: [metres]
-      default: metres
-      description: >
-        The base unit of measurement for all coordinates in this world.
-    unitsPerMeter:
-      type: number
-      exclusiveMinimum: 0
-      description: >
-        Scale factor from world units to metres. 1.0 when units are metres
-        at 1:1 scale.
-    upAxis:
-      type: string
-      enum: [y, z]
-      description: >
-        The axis that points away from the ground.
-    extent:
-      type: number
-      exclusiveMinimum: 0
-      description: >
-        Radius in world units of the smallest sphere centred at the origin
-        that contains all addressable content.
-  required: [units, upAxis]
-```
+Use the single proposal in [chapter 01, Optional World coordinate metadata](01-coordinate-precision-units-and-extents.md#optional-world-coordinate-metadata): unitsPerMeter is local coordinate units per physical metre, with no inferred default; upAxis, handedness and extent are optional metadata. Full basis/origin mapping remains explicit. Extent remains optional in the base proposal. A future composition profile can require a known frame and ratio, but must define how they are obtained and what happens when unavailable.
 
-Rationale for each field:
-
-- `units` MUST be declared. Without it, metre scale is an assumption that is never stated.
-- `upAxis` MUST be declared. Without it, a Z-up world renders upside down in a Y-up host.
-- `unitsPerMeter` SHOULD be declared. Without it, a compositor mounting a child world cannot compute the correct scale.
-- `extent` SHOULD be declared. Without it, a renderer has no information to size the float32 normalization domain.
-
-```yaml
-# Tighten Node.localTransform
-Node:
-  type: object
-  properties:
-    localTransform:
-      type: array
-      items:
-        type: number
-      minItems: 16
-      maxItems: 16
-      description: >
-        Column-major 4x4 affine transformation matrix from this node's
-        local space to its parent's space.
-```
-
-Rationale: Node.localTransform SHOULD be defined as a 16-element column-major 4x4 matrix. An array of numbers with no length or order convention is ambiguous.
+For aligned distance components, `target = source / sourceUnitsPerMeter * targetUnitsPerMeter`. Thus 100 source units at 100 units/metre becomes one target unit at one unit/metre. Frame translation/rotation and intentional model scale are separate. Requiring fields or fixing a 16-element matrix length narrows the currently accepted payload set and needs a declared version/profile. Missing metadata is not permission to assume metre-scale Y-up.
 
 ### Shared spatial anchors
 
-```yaml
-# New resource on the World endpoint (extension track)
-SpatialAnchor:
-  type: object
-  properties:
-    id:
-      type: string
-    pose:
-      $ref: '#/components/schemas/GeoPose'
-    confidence:
-      type: number
-      minimum: 0
-      maximum: 1
-    provider:
-      type: string
-      description: >
-        Identifier of the anchoring system (e.g. "webxr-anchors",
-        "arcore", "arkit").
-```
+Candidate direction: define how an agreed shared-anchor service is referenced, rather than equating a local tracked pose with cross-device localization. A profile must name the anchor namespace, frame, discovery/localization protocol, confidence/error meaning, permissions, lifetime and failure behavior. Its acceptance fixture should have two independent devices resolve the same physical anchor and report placement error.
 
-Rationale: WoW SHOULD define a spatial-anchor vocabulary or adopt the emerging WebXR Anchors Module by reference. This is a greenfield problem the group can own. This is an optional extension; a world that does not support AR anchoring omits it.
+This report does not select a provider or offer a schema that appears sufficient before those semantics are chosen. WebXR tracked anchors can be one client-side input; shared discovery and localization require their own binding.
 
 ### Portable inventory
 
-```yaml
-# Addition to the UserManifest schema or a new PortableInventory schema
-InventoryItem:
-  type: object
-  properties:
-    id:
-      type: string
-    assetURI:
-      type: string
-      format: uri
-    licence:
-      type: string
-      description: >
-        SPDX licence identifier or URI to a licence document.
-    provenance:
-      type: string
-      format: uri
-      description: >
-        URI of the world where this item was acquired.
-  required: [id, assetURI]
-```
-
-Rationale: WoW SHOULD define a portable-inventory schema (item reference, licence, provenance) or adopt by reference from the Universal Manifest's equipped-items vocabulary. This is an optional extension; a minimal world that does not support item transfer omits it.
+Use the optional [InventoryItem sketch in chapter 05](05-presence-live-sync-and-persistence.md#portable-inventory-optional-extension) as the common candidate vocabulary. Its item_id, asset_uri, licence and provenance fields are illustrative data, not ownership or usage authorization. A versioned Universal Manifest profile can be evaluated once its exact schema and rights semantics are named. The draft imposes no new required User or manifest properties.
 
 ### User preferences
 
-```yaml
-# Addition to the UserManifest schema
-Preferences:
-  type: object
-  properties:
-    accessibility:
-      type: object
-      properties:
-        textScale:
-          type: number
-          minimum: 0.5
-          maximum: 4.0
-        highContrast:
-          type: boolean
-        reduceMotion:
-          type: boolean
-    inputPreferences:
-      type: object
-      description: >
-        Client-side input configuration. Schema intentionally open
-        to avoid prescribing controller layouts.
-    renderQuality:
-      type: string
-      enum: [low, medium, high]
-```
+Use the optional [UserPreferences sketch in chapter 05](05-presence-live-sync-and-persistence.md#portable-preferences-optional-extension). Its text_scale, reduced_motion, high_contrast, input and rendering_quality members remain candidates. A profile must state consent, supported-setting discovery and the observable effect of accepted settings. Existing payloads remain valid without these members; the exchange is separate from accessibility conformance.
 
-Rationale: WoW SHOULD define a preference vocabulary on the user manifest. At minimum: accessibility settings (per WCAG), input preferences, and rendering quality. This is an optional extension.
+### Software-agent declarations
 
-### AI agent identity
+This optional metadata fragment targets OpenAPI 3.0.4. It is added through a compatible User extension; it does not replace canonical numeric User.id.
 
 ```yaml
-# Addition to the User schema (extension track)
-User:
+AgentDeclaration:
   type: object
   properties:
-    agentType:
+    actorType:
       type: string
-      enum: [human, agent]
-      default: human
+      enum: [human, software-agent]
+      description: Self-declared actor type; absent means undeclared.
     capabilities:
       type: array
       items:
         type: string
-      description: >
-        Declared capabilities of an agent user (e.g. "navigation",
-        "translation", "content-generation").
+      description: Declared capabilities, not granted permissions or verified test results.
 ```
 
-Rationale: WoW SHOULD define an agent identity type on the User resource (human vs agent, capability declaration) or explicitly defer to a future extension track with a timeline. The whitepaper SHOULD NOT promise AI integration without specifying when and how.
+No default implies that an undeclared actor is human. Both fields are optional; `{"actorType":"software-agent","capabilities":["navigation"]}` passes the sketch, while an unrecognized actorType fails. Authentication, operator identity, delegation, consent, issuer trust and permission checks remain external to this shape. The group must decide what assurance is required before using it for admission or execution.
 
-### Governance document
+### Governance document references
 
-No schema fragment applies. WoW SHOULD write a governance document covering:
-
-- The initiative hub structure and its relationship to the MSF infrastructure.
-- The business council charter and membership criteria.
-- The maintainer council charter, scope, and relationship to the initiative hub.
-- The licence and contributor licence agreement policy.
-- The SDO liaison protocol for coordinating with external standards bodies.
-
-Rationale: governance is the most discussed topic (599 transcript hits, more than any other individual topic) and none of it is codified. The licence discrepancy is a concrete blocker for any organization evaluating adoption.
-
+Candidate request: publish authoritative pointers to the initiative's decision process, maintainer responsibilities, contribution/license policy and external standards-body relationships. First locate and evaluate existing documents, including the whitepaper's adoption plan. Draft only missing rules after the responsible group confirms its scope. The report makes no license determination from a keyword table.
 
 ## Adoption path
 
-**What stays valid for a minimal world.** A server that implements the current eight schemas and sixteen operations remains conformant. Every addition proposed above is additive. The precision vocabulary (units, upAxis) is the only MUST-level change; a minimal world that operates at metre scale with Y-up can declare `units: metres, upAxis: y` and nothing else changes. Shared anchors, portable inventory, user preferences, and agent identity are optional extensions that a minimal world omits.
+**Existing payloads and clients.** Optional metadata can leave existing payloads valid. It does not guarantee that clients understand new semantics, and a supported profile must not be silently downgraded when required behavior is unknown. OpenAPI's acceptance of extra fields is a shape rule, not a universal instruction to ignore every unsupported capability safely.
 
-**What a client must do.** A client that receives a World response with `units` and `upAxis` MUST use them for coordinate composition. A client that receives a World response without `units` SHOULD treat the world as metre-scale Y-up and log a warning. A client that encounters a `SpatialAnchor`, `InventoryItem`, `Preferences`, or `agentType` field it does not support MUST ignore the field without error, per standard OpenAPI forward-compatibility.
+**Profile participants.** Declare the version and supported profile. Establish frame/unit information before placement, negotiate graph and asset representations, and apply agreed target-resolution and failure rules. Keep per-world presence, visual continuity and session authority distinct. Require separate trust/admission/execution policies wherever the profile needs them.
 
-**What a server must do.** A server MUST add `units` and `upAxis` to its World response. A server SHOULD add `extent` and `unitsPerMeter` when the world operates at non-unit scale. A server MAY add spatial anchors, inventory, preferences, and agent identity when the world supports those features. A server MUST resolve the licence discrepancy before the governance document is published.
-
+**Working group.** Choose a minimal scenario and independent consumer test before making a broad conformance claim. Preserve the five bounded asks and optional tracks. New required properties, identifier-type changes, mandatory formats or a default graph-form change require explicit compatibility decisions.
 
 ## Open questions for the working group
 
-1. Should `units` support an extensible enum beyond `metres` (e.g. astronomical units, feet), or should all non-metre worlds express scale through `unitsPerMeter` alone?
-
-2. Should Node.localTransform be row-major or column-major? glTF uses column-major; USD uses row-major. The choice is arbitrary but must be stated.
-
-3. Should the spatial-anchor vocabulary live on the World resource, on a new /wow/anchor endpoint, or be adopted entirely by reference from WebXR Anchors?
-
-4. Should portable inventory ride on the user manifest (alongside the avatar) or on a separate /wow/inventory endpoint that a world can opt into?
-
-5. Should the governance document live in the WoWAPI repository or in a separate governance repository? The answer determines who has commit access to it.
-
-6. Should the working group adopt a formal versioning policy (SemVer on the OpenAPI version field) before or after the conformance RFC lands?
-
+1. Which minimal scenario defines the first behavioral profile, and which identity, live-session, rendering and anchor layers does it reference?
+2. Which frame, units and matrix conventions are required, and what asymmetric placement fixture and error budget test them?
+3. Does the anchor need include cross-device discovery/localization, and which existing service or standard supplies it?
+4. Which exact inventory and preference profile should be evaluated, with what consent, rights and destination-support rules?
+5. What actor/operator/delegation assurance is needed for software participants beyond self-declared capabilities?
+6. Where are the authoritative governance, contribution/license and standards-body coordination documents, and which missing parts need group action?
+7. How will API version, document version and optional profile identifiers be distinguished during migration?
 
 ## Sources
 
-- R1: Socket map (102 rows). Repository-relative: `.dev/ai/subtask-comms/2026-09-07-03-19-33Z-WO-SCRAP-20260907-019-R1-md.md`
-- R2: Discussion evidence (12 topics). Repository-relative: `.dev/ai/subtask-comms/2026-09-07-03-19-33Z-WO-SCRAP-20260907-019-R2-md.md`
-- R3: Claimed scope vs defined surface (35 rows). Repository-relative: `.dev/ai/subtask-comms/2026-09-07-03-19-33Z-WO-SCRAP-20260907-019-R3-md.md`
-- COMPANION.md: Infrastructure WG architecture map companion text. Repository-relative: `repo/msf-wg-tool/infrastructure-wg/model/COMPANION.md`
-- OpenSpatialWorld API.yaml, commit d39a1a0. Public: `https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml`
-- OpenUserManifest API.yaml, commit d39a1a0. Public: `https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml`
-- OpenSpatialWorld README.md, commit d39a1a0. Public: `https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md`
-- Completion Map: 73 rows. Repository-relative: `.dev/ai/reports/2026-09-07-02-53-07Z-web-of-worlds-completion-map.json`
-- Findings and Recommendations. Repository-relative: Desktop delivery at `FINDINGS-AND-RECOMMENDATIONS.md`
-- OSL schema.yaml (not public; extension labels visible at lines 697-714, 784-810, 895-910)
-- OSL DESIGN-NOTE-fabric-as-precision-domain.md (not public; cited sections at lines 35-72, 250-280)
+- [Linked Spatial Experiences: The Web of Worlds, April 2, 2025](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/): published units, preview, authorization and aspect intent.
+
+- [OpenSpatialWorld API 0.0.1 at d39a1a0](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), [OpenSpatialAsset API](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml), [OpenUserManifest API](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml) and [OpenSpatialWorld README](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md), checked September 7, 2026.
+- [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf), printed pages 7, 15, 22, 25, 26, 28 and 30.
+- [OGC GeoPose 1.0](https://docs.ogc.org/is/21-056r11/21-056r11.html), Basic YPR frame and extension requirements.
+- [WebXR Anchors Module](https://immersive-web.github.io/anchors/), draft consulted September 7, 2026: tracked anchor spaces; no cross-device acceptance result is claimed here.
+- [OpenAPI 3.0.4 Schema Object](https://spec.openapis.org/oas/v3.0.4.html#schema-object) and [W3C Verifiable Credentials 2.0 trust model](https://www.w3.org/TR/vc-data-model-2.0/#trust-model).
+- Selected local infrastructure map and topic inventory, September 7, 2026: 102 authored map rows and keyword-discovery material. Public reproduction of these exact local artifacts is not established. Neither establishes worldwide absence or comparative discussion frequency.
+- Open Spatial Lab source snapshot and retained local numerical, crossing, contract and signing receipts, checked September 7, 2026. Exact proof classes and limits appear in chapters 01–09; no fresh network, renderer or cross-engine acceptance test is claimed.
 
 ## Change log
 
-2026-09-07: first public draft, verified; 2026-09-07 steward edit: remarks on the reference implementation licence files removed.
+- 2026-09-07: replaced global absence and completion claims with scoped source findings; aligned coordinate, optional-profile, trust, presence and evidence boundaries with chapters 01–09.

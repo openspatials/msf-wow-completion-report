@@ -1,86 +1,96 @@
 # Method and Sources
 
-## The implementation as the source of the findings
+This report compares the published Web of Worlds architecture with a pinned application programming interface (API), draws on a local implementation, and offers explicit proposals for shared bindings. Source inspection, executed tests, historical receipts and proposed behavior are different kinds of evidence. The report does not establish independent cross-engine, network-scale or production acceptance.
 
-Every finding in this package originates from building a working Web of Worlds implementation. Open Spatial Lab built a working implementation against the Web of Worlds specification at commit d39a1a0 over the course of 2026: a composition graph, portal traversal with no page reload, signed spatial documents verified fail-closed, a real-time presence channel, a URL fragment grammar, and a service discovery mechanism. The findings are the specification silences and defects that implementation encountered, documented with the extensions and conventions that were built to fill them.
+## How the comparisons were made
 
-The implementation is the primary source. Where the specification is silent, the finding reports what the implementation had to build to keep working. Where the specification contradicts itself, the finding reports the contradiction with the line numbers. Where the specification carries a defect (a misspelling, a missing parameter, a truncated sentence), the finding reports the defect and its downstream effect. No finding is asserted from speculation alone; each traces to a concrete code path, a schema field, a test count, or a verified keyword search against the canonical specification.
+Each comparison starts with the publisher's actual position, including architecture outside the machine-readable API. The current binding is then read in the pinned API files and their resource-specific READMEs. Local evidence can show why a binding matters, but one implementation's convention does not become a standards requirement.
 
-## Specification commit and upstream check
+| Evidence class | What it establishes | Boundary |
+|---|---|---|
+| Published architecture | A goal, relationship, use case or intended behavior at the cited page/section. | Does not establish a complete wire contract, adoption or implementation. |
+| API binding | A method, path, field, type, response or README provision at the pinned commit. | Does not supply every behavior mentioned by a publication. |
+| Executed local check | A named input produced the recorded result in the stated environment. | Does not establish behavior outside the tested inputs or independent implementations. |
+| Historical local receipt | A retained record describes a particular earlier execution. | Is not a fresh rerun, a similarly named current file or a reliability estimate. |
+| Proposal or open decision | Candidate text, an optional extension, an informative implementation choice or an acceptance test. | Does not imply group adoption or completion of the test. |
 
-The specification was examined at commit d39a1a0 of the WebOfWorlds/WoWAPI repository. On 2026-09-07, the upstream main branch HEAD was confirmed equal to d39a1a0 by `git ls-remote` (verified). Every spec citation in these documents is anchored to that commit with a GitHub blob link.
+Searches helped locate material. A missing word was not used to prove missing architecture or behavior. Extra properties are permitted by the reviewed resource schemas, and existing type constraints can reject invalid data. `allOf` applies every member's constraints; it has no override order. These interpretations follow the [OpenAPI 3.0.4 Schema Object](https://spec.openapis.org/oas/v3.0.4.html#schema-object).
 
-The whitepaper page was checked on the same date: the live page was byte-identical to the local capture (file comparison, verified). The simpleWorlds reference implementation has moved (HEAD d2bda3e vs the cited 13d2cbe); this package cites simpleWorlds only for its choice of URL path (`/wow/scene/` vs the API's `/wow/spatial/`) and, in document 10, for its two licence files; its code is not assessed.
+## Named source set and versions
 
-## The standards map as the scope lens
+The [source-by-source account](11-published-positions-and-current-state.md#source-by-source-coverage-account) maps the complete bodies of the following sources. References linked from those works are background, not automatically additional publications in this comparison.
 
-The MSF Infrastructure Working Group architecture map (openspatials.com/msf/map, HTTP 200 on 2026-09-07) provided the scope lens. Its companion data (102 interop sockets across six MSF subjects) was used in document 10 to map which sockets Web of Worlds covers, which it partially covers, and which are blind spots. This framing keeps the report's scope aligned with the working group's own architecture rather than the author's preferences.
+| Source | Version and check |
+|---|---|
+| [Full whitepaper](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf) | March 31, 2026; 33 pages. September 7, 13:37 UTC PDF bytes match the earlier same-day substantive capture. SHA-256 `a43200294fb15ca6bfa80f93a1ee810eba2c010f76a88d39affde0cfd179110a`. All 33 pages were read. The source diagrams carrying world, graph, resolver and service relationships were checked visually; this revision rechecked pages 14, 17, 21, 22, 24 and 27. |
+| [Executive summary](https://webofworlds.github.io/initial_MSF_Whitepaper/) | Labelled 2026-Q1; distinct from the full paper. September 7, 13:37 UTC HTML SHA-256 `6d6f04018e186aa41a5ee3d305d96983dec06a20c0ea361ce5fa13cf7ee4da72`. Source repository HEAD was `988f369b0af206de0a7b53e7903dd55e08be80a0`. |
+| [Announcement post](https://metaverse-standards.org/news/blog/announcing-the-web-of-worlds-whitepaper-a-concrete-path-to-the-open-metaverse/) | Visible June 2, 2026; publication metadata `2026-06-03T01:40:32+00:00`. September 7, 13:37 UTC HTML SHA-256 `40155229ff087b6a2ac6bfb1f223dda33930cc7f6cbe78109d300425026664c7`. All article sections, including Next Steps, were read. |
+| [Linked Spatial Experiences post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/) | April 2, 2025; metadata modified September 4, 2025. September 7, 13:37 UTC HTML SHA-256 `5446deb416ea2903640057b53d14d6860505df92ae439a16d2f9242aca73a7f9`. All requirement groups, examples and roadmap text were read. |
+| [WebOfWorlds home](https://webofworlds.github.io/) | September 7, 13:37 UTC HTML SHA-256 `52af48d6e82b2f62d3055def154ead83c8e0b7190c130d6a44995c2ef675d3d4`; site repository HEAD `6f14cd37823bd7c4c698f94a97893366e4dc07f3`. Includes both implementation tables and architecture diagrams. March 31 dates the linked paper, not all home-page content. |
+| [WoWAPI](https://github.com/WebOfWorlds/WoWAPI/tree/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de) | API version 0.0.1, commit `d39a1a009aa4ef8fb6d14aa66d588cffb74c33de`, May 21, 2026. Upstream HEAD matched in the September 7, 13:38 UTC check. All three API files, five READMEs and architecture diagrams were included. |
+| [simpleWorlds](https://github.com/WebOfWorlds/simpleWorlds) | Bounded context: the public README API table and API path declaration at `13d2cbea991e17df0b14857f11f693712e6171cb`, fetched September 7, 20:51 UTC. Only declared paths are compared. The earlier HEAD check returned `d2bda3e2e73097c6e36ae0fd65a935cb3064ce71`; implementation internals and conformance are not assessed at either version. |
 
-## Transcripts as discussion evidence
+The three API files are [OpenSpatialWorld](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml), [OpenSpatialAsset](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialAsset/API.yaml) and [OpenUserManifest](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenUserManifest/API.yaml). World declares OpenAPI 3.0.4; Asset and User Manifest declare 3.0.3. The five READMEs are at repository root, `specification/`, and those three resource directories. Fragment examples and optional `/wow/scene/` exposure appear in the [World README](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/README.md#L5-L31), not the top-level README.
 
-Five meeting transcripts from the MSF Web of Worlds working group were used as discussion evidence. The transcripts provided topic counts (how many times a subject was discussed and by whom), direct quotes attributed to specific participants in their own words, and the verbal commitment for this talk. Dates of the meetings used: 2026-06-01, 2026-06-15, 2026-06-29, 2026-07-13, and 2026-08-24. No participant is quoted except in their own words from the transcript. Governance discussion frequency (599 hits across the meetings) is cited as evidence that governance is the most-discussed and least-codified topic.
+The September 7 home capture lists Open-Spatial-Lab among its world implementations. Source checks establish the inspected versions, not delivery of every roadmap milestone or published implementation level. HTML hashes bind exact captures; navigation changes can alter those bytes without changing article text.
 
-## Verification
+The path comparison reads the [World README](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/README.md#L17-L31), [paper p29](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=29), and [simpleWorlds API](https://github.com/WebOfWorlds/simpleWorlds/blob/13d2cbea991e17df0b14857f11f693712e6171cb/packages/wow-spec/src/schema.yaml#L124-L228) as distinct source artifacts. All use `scene`; the canonical World YAML uses `spatial` and includes `spatialID`. This comparison reads declarations only. It makes no claim about simpleWorlds handler order, socket validation, persistence or runtime behavior.
 
-Each of the ten documents was verified by two independent adversarial passes before the author's name was attached:
+## Register units and coverage
 
-- **Spec lens.** Every specification quote was checked byte-exact against API.yaml and README.md at commit d39a1a0. Every line number was confirmed. Every "silent" claim (a keyword with zero hits) was re-searched. Every link was followed.
+Document 11 contains **76 active public-source comparison entries**, retaining **80 public identifiers** and **four explicit aliases**. Original public identifiers 1–44 survive; additions are 45–80; aliases are 31→5, 32→19, 34→6 and 35→7. **Five meeting-context identifiers, G1–G5, retain their original names and remain separate.**
 
-- **Implementation lens.** Every claim about the Open Spatial Lab codebase was checked against the source files cited. People were quoted only in their own words from the transcripts. The claim boundary (local proof, no conformance claim, every response carries `standards_conformance: false`) was confirmed present and consistent. Numbers (48/48 crossing-continuity, 55/55 signed-subtree contract checks, 22-check schema validation) were checked against their documented sources and attributed to the codebase that produced them. Numbers documented by Open Spatial Lab but not re-run in this pass are marked as reported with medium confidence.
+An entry groups related subclaims when they share a binding question and evidence boundary. Distinct API operations and the five spatial-computing operators remain separate. These are comparison entries, not atomic requirements. The page/section account exposes the grouping and accounts for context such as bibliography entries. The former 49-row total mixed public entries and meeting notes; its 20/17/12 classification is retired.
 
-A fix pass applied the verifiers' findings; a confirm pass re-checked only the items raised. One round; a second only for a named defect.
+The count does not measure standards completeness. The eleven chapters and two appendices organize the report. Appendix A's selected specification surfaces and Appendix B's findings are documentation units, not independent interoperability outcomes.
 
-**Document 11 and the appendices.** Document 11 and appendices A and B were written after the ten documents and verified in two passes. The first pass checked 178 claims and 34 section pointers and raised 11 findings (line-number offsets in document 11, a word count, and the meeting dates); all were applied and confirmed. The final pass re-ran every upstream freshness check (a live fetch of every page and `git ls-remote` of every repository, 2026-09-07T08:12Z, same results), checked 567 claims and all 98 section pointers, and raised 48 findings (5 major: the declaration count, transcript quotation beyond the recorded ledger, one wrong zero-hit search, a licence remark about the reference implementation, and the statement about how simpleWorlds is cited; 43 minor); all were applied and confirmed.
+## Executed checks on September 7
 
-**Totals across the ten documents:** 609 claims checked, 63 findings raised, 61 resolved, 2 unresolved. The two unresolved items are minor citation corrections: one in document 07 (a search-term list that included a term with one hit among terms with zero hits, which was corrected in the document text but flagged late in the confirm pass) and one in document 09 (a line-range citation for an extension policy section). Neither affects a substantive claim.
+The checks below ran earlier on September 7. This revision read their retained outputs and rechecked load-bearing source text. It also checked declaration mapping, citation resolution, source hashes and report consistency. It did not rerun the successful behavior/signing suites or a live demonstration.
 
-## What was deliberately excluded
+| Check | Recorded outcome | Evidence boundary |
+|---|---|---|
+| Canonical World component schemas | All six accepted `{}` and an extra property; all six rejected an array. A Node with string `id` was rejected. | Shared schema subset, not full OpenAPI-document or HTTP validation. Existing types and endpoint constraints still matter. |
+| `allOf` counterexample | Neither a number nor a string satisfied conflicting `id` constraints, in either member order. | Demonstrates conjunction, not precedence. |
+| Coordinate counterexample | Three power-of-two scaling choices retained 16,384-metre float32 spacing at the tested astronomical distance. Subtracting a nearby origin before casting retained the one-metre difference. | Refutes universal precision restoration by scaling; does not select a renderer strategy. |
+| Presence controller in isolation | The controller used an in-memory transport that lost the explicit departure request and then registered at the destination; both simulated registries retained the user. | The probe bypassed the source server’s exit-intent handler. It tests the isolated controller, not the integrated crossing path and not an atomic transfer between servers. |
+| Manifest copy/tamper | Original and copied signed bytes verified; altered content failed. | Signed-byte integrity and key consistency, not attested age, holder control or admission. |
+| URL composition | A query-bearing URL parsed; blindly appended path text landed in its query. | Wrong endpoint composition, not invalid syntax. Relative references need a defined base. |
+| Supplied schema fixtures | 44 of 44 passed. | Limited evaluator and declared-divergence cases, not full OpenAPI or live HTTP validation. |
+| Supplied signing vectors | 91 of 91 passed. | Local signing profile and supplied inputs, not general identity or policy assurance. |
+| Supplied adversarial/signing-profile cases | 35 supplied expected/resisted cases passed, with two input-discipline boundaries reported. | The log states that safe-integer range and duplicate-key rejection need input controls; those guards are not established by this result. No general security guarantee. |
 
-**Reference-implementation defects.** The simpleWorlds reference implementation's own code defects were left out of these documents. The report covers specification defects, not implementation bugs. Where simpleWorlds makes a different path choice than the API (`/wow/scene/` vs `/wow/spatial/`), the contradiction is noted as a specification erratum, not an implementation defect.
+The source-server inspection adds a separate fact: when an exit-intent with a player identifier is accepted, the server removes that player’s local presence and sets a five-second departure tombstone, which blocks heartbeat upserts during that interval. A failed exit-intent request leaves the client in its source view. If the server removed presence but its response was lost, the client can remain visible locally while absent from the registry until recovery. Destination arrival and registration are separate requests. Expiry and tombstones bound particular local cases; they do not establish global exclusivity under arbitrary network failure.
 
-**Private evidence tiers.** The Open Spatial Lab codebase is in a private repository (public release planned at github.com/grigb/open-spatial-lab). Schema lines, design-note sections, and architecture documents are cited by path and line number. The citations are verifiable once the repository is public. Until then, they are reported evidence, not verified by an outside reader.
+The inspected source server uses a ten-second default presence lifetime, configurable from one to sixty seconds, and a three-second heartbeat hint. These are implementation settings observed in source, not newly executed failure/recovery results or required WoW timings.
 
-**Unverified claims.** Any claim that could not be confirmed by the verification passes was removed or rewritten as an open question. Nothing unverified survives in the final documents.
+The bounded probes recorded Node v22.22.3 and observation time `2026-09-07T12:21:09.193Z`. Public specification links let readers inspect source claims. Local execution records remain reported evidence where the underlying repository or receipt is not available to an outside reader.
 
-**Evidence counts not re-run.** The 48/48 crossing-continuity count and the 55/55 signed-subtree contract check count are documented by Open Spatial Lab and attributed to that codebase. They were not re-run as part of this verification. Their confidence is marked as medium until re-run.
+## Historical implementation evidence
 
-**Demo material.** No live demonstration is included in this package. The demo recordings, launcher scripts, and demo-plan documents produced during preparation are retained as internal evidence. The findings stand on the specification text and the code, not on a live performance.
+| Exact receipt | Supported result | Limitation |
+|---|---|---|
+| July 5, 2026 three-window record; SHA-256 `ba8449242041cf30401a6751c48cb761cb9a2be3a06f9479f395123c863be2c6` | Assertions passed; navigation counts remained one in the player and both observer windows. | One recorded local visual-continuity scenario, not independent implementations or network reliability. |
+| July 11, 2026 record with the same basename; SHA-256 `909a8f8d5475b97f1dff4bace49eea9aa1df30c4d24cdadab03aa9a1d8ecba50` | The same navigation counts were recorded. | Overall assertions were false because three expected conformance declarations did not match. It cannot silently replace the earlier passing receipt. |
+| Retained deterministic crossing record; SHA-256 `e268b1d716beb3e1ce7c28e1c3e02d8985d15ef595cc198845ca9d70563c6f42` | 81 passing assertions in a Node-based local check. | No browser execution; some assertions check source-code presence. Neither 81 nor the older “48/48” caption counts independent user journeys. |
+| Historical 55-check subtree result, July 11, 2026 | Cumulative 29 previous checks plus 26 new schema/contract and discovery/transform-handover checks. | The scene builder excluded browser DOM, fetch, WebAssembly and renderer execution. These are not 55 cryptographic or rendered-subtree tests. |
 
-## Reference set of Web of Worlds publications
+Signed-fabric refusal applies to its configured payload and trust anchor. The inspected portal path separately continues after a failed manifest result or arrival notification. Signature validity, trusted assertions, holder control, admission, execution permission and test receipts remain distinct. A capability flag is a declaration even when signed.
 
-Document 11 (Published Positions and Current State) uses the following publications as its reference set. Each is cited with its version or date, capture date, and freshness check result.
+## Meeting and ecosystem context
 
-- **Whitepaper**: "initial Web of World Whitepaper", 2026-Q1. Page: https://webofworlds.github.io/initial_MSF_Whitepaper/ . PDF: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf . Source: https://github.com/WebOfWorlds/initial_MSF_Whitepaper (HEAD 988f369b on 2026-09-07). Local capture: 2026-06-23. Freshness check 2026-09-07T07:05Z, repeated 08:12Z: live page byte-identical to the capture.
+Meeting material from June 1, June 15, June 29, July 13 and August 24, 2026 informs discussion context. Document 11 preserves five August 24 governance notes separately from public declarations. They do not prove an adopted charter, executed agreement or absence of governance documents.
 
-- **MSF announcement post**: "Announcing the Web of Worlds whitepaper: a concrete path to the open metaverse", published 2026-06-03 (page metadata; the page displays Jun 2, 2026). https://metaverse-standards.org/news/blog/announcing-the-web-of-worlds-whitepaper-a-concrete-path-to-the-open-metaverse/ . Local capture: 2026-06-23. Freshness check 2026-09-07T07:05Z, repeated 08:12Z: article text identical; site-wide CSS and navigation menu items changed.
+An earlier topic table used keyword thresholds to label material “specified” or “discussed.” Its governance row totals **599 keyword hits across five transcripts**: 139 + 36 + 159 + 154 + 111. The recorded unit is matching transcript lines, not discussion events, elapsed time or a defensible ranking. Those labels and the governance superlative are not evidence here. No fresh semantic coding of the five transcripts is claimed.
 
-- **MSF post**: "Linked spatial experiences: the Web of Worlds", published 2025-04-02, modified 2025-09-04. https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/ . Local capture: 2026-06-23. Freshness check 2026-09-07T07:05Z, repeated 08:12Z: article text identical; site-wide CSS and navigation menu items changed.
+The [infrastructure map](https://openspatials.com/msf/map) provides a useful comparison lens. Its selected 102 rows across six subjects describe that corpus. The retained classification has one “yes” (`net.address`), 17 “partial” and 84 “no” cells for WoW; these are labels in that map, not conformance verdicts. A blank cell does not establish worldwide absence, set priority or make WoW responsible for every concern. Adjacent projects retain different evidence levels; documentation about one project is not equivalent to an executed receipt for another.
 
-- **GitHub Pages home**, dated 2026-03-31. https://webofworlds.github.io/ . Local capture: 2026-07-01. Freshness check 2026-09-07T07:05Z, repeated 08:12Z: two changes to the visible text since capture, plus one changed link target. (1) "official Spatial Computing WG" became "new Spatial Computing WG". (2) Implementations table: HTMLModeWrapper replaced by Open-Spatial-Lab (Apache-2.0, Level 5, gltf-binary). (3) The MSF Project slides link points to a different presentation. Updated capture saved as 2026-09-07-webofworlds-github-pages-home.html; the live page was byte-identical to it at 08:12Z.
+## Limits and proposal status
 
-- **Specification**: https://github.com/WebOfWorlds/WoWAPI at commit d39a1a0 (2026-05-21). Freshness check 2026-09-07T07:05Z, repeated 08:12Z: upstream HEAD d39a1a0, equal to cited commit (verified by git ls-remote).
+This report supplies no new independent engine-to-engine crossing, multi-device localization, distributed replay/recovery, all-format rendering, production trust or security-policy acceptance. It does not assess simpleWorlds internals, execute native TeleportXR or audit every Universal Manifest policy module. The limited simpleWorlds path comparison described above does not extend that boundary. Future tests are acceptance criteria, not completed results.
 
-- **Reference implementation** (named only, not assessed): https://github.com/WebOfWorlds/simpleWorlds at commit 13d2cbe. Freshness check 2026-09-07T07:05Z, repeated 08:12Z: HEAD d2bda3e, moved past cited commit. Cited for its URL path choice and, in document 10, for its two licence files; its code is not assessed.
+The [five bounded asks](README.md#five-decisions-for-the-working-group) remain concrete decisions. Optional profiles can be evaluated without adopting one renderer's choices. Compatibility needs explicit old/new examples and failure behavior; retaining a field name does not prove it.
 
-## Appendices
+Source and consistency checks improve traceability. Internal review-pass and claim-review tallies do not count independent experiments, independently proven truths or a confidence score. This is a draft for working-group review dated September 7, 2026; proposed text is not adopted policy.
 
-- **A-completion-map.md**: the 73 specification surfaces with their status and the document that covers each one.
-- **B-findings-register.md**: the 25 findings from the implementation effort, each with a recommendation, an evidence level, and the document that treats it.
-
-## Dates
-
-- Specification commit d39a1a0: 2026-05-21.
-- Upstream freshness check (`git ls-remote`): 2026-09-07 (07:05Z, repeated 08:12Z).
-- Whitepaper text check: 2026-09-07.
-- GitHub Pages home freshness check: 2026-09-07 (changed; updated capture saved).
-- MSF announcement post freshness check: 2026-09-07 (article text identical).
-- MSF linked-spatial-experiences post freshness check: 2026-09-07 (article text identical).
-- Standards map availability check (HTTP 200): 2026-09-07.
-- Meeting transcripts used: 2026-06-01, 2026-06-15, 2026-06-29, 2026-07-13, 2026-08-24.
-- Documents written and verified: 2026-09-07.
-- Final verification pass over document 11 and the appendices: 2026-09-07.
-- This method document: 2026-09-07.
-
-## Change log
-
-- 2026-09-07: first public draft, verified twice.
+GeoPose interpretation follows [OGC GeoPose 1.0, Requirements 4, 12 and 13](https://docs.ogc.org/is/21-056r11/21-056r11.html): Basic YPR uses the specified WGS-84/ENU frame and ellipsoidal height. Additional metadata does not redefine those semantics. A `lan`/`lon` correction can fix an example’s shape without proving its coordinate values or scene mapping. URI-reference interpretation follows [RFC 3986, section 5](https://datatracker.ietf.org/doc/html/rfc3986#section-5); a URL’s entry query and fragment must not be confused with its service path.

@@ -1,8 +1,8 @@
 # Portal Destination and the Traversal Protocol
 
-The Web of Worlds specification defines a Portal as a positioned point with no target. A portal that cannot say where it leads cannot connect two worlds, and a standard with no traversal protocol leaves every implementer to invent their own crossing. This document proposes the normative additions that turn the Portal into a link and define what happens when a user walks through it.
+WoWAPI 0.0.1 defines a positioned Portal but no canonical destination property or interoperable traversal protocol. The whitepaper describes linked spatial resources; the proposal here binds a portal target in the API and identifies the remaining traversal decisions. Existing open objects permit implementation-specific target fields already.
 
-The core addition (high confidence, verified against the spec and a working implementation): Portal MUST carry a destination object with at minimum a target world identifier and a target base URL. The traversal protocol additions (medium confidence, proven in one implementation, not yet tested between independent implementations): the standard SHOULD define pose mapping across portal frames, server-side exit and arrival notifications with a correlation identifier, a depart-then-register presence lifecycle, and a trigger geometry model for portal activation. Three items are open questions for the working group: whether to adopt the OMA3 IWPS Query-then-Teleport handshake, what a portal's TRS scale means in a rigid host graph, and whether native TeleportXR teleport is required for conformance.
+The immediate ask is an optional canonical `destination` field while retaining numeric Portal identifiers. A separate future traversal profile would define target resolution, pose mapping, notifications, presence recovery and activation. The local prototype supplies implementation evidence and failure cases; it does not prove a complete protocol between independently operated worlds.
 
 **Status:** Specification examined at commit d39a1a0 (WebOfWorlds/WoWAPI main, checked 2026-09-07).
 
@@ -42,22 +42,22 @@ Portal:
 
 Two properties: `id` (number) and `geoPose` (position plus angles). No destination, no target, no frame geometry, no traversal mode, no interaction volume.
 
-GET /wow/portal/{portalId} returns this schema ([API.yaml lines 109-129](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L109-L129)). The response carries no additional fields beyond the schema above.
+GET /wow/portal/{portalId} returns this schema ([API.yaml lines 109-129](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L109-L129)). The response schema defines no other members; because the object is open, extra implementation fields are allowed.
 
 The Node schema ([API.yaml lines 471-495](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L471-L495)) has no type or role field. A client reading the composition graph cannot distinguish a portal node from a geometry node without out-of-band knowledge.
 
-The specification is silent on portal traversal. Searches for the following terms in API.yaml at commit d39a1a0 return zero results: `destination`, `target`, `crossing`, `traversal`, `handoff`, `handshake`, `trigger`, `zone`, `prefetch`, `arrival`, `departure`, `exit-intent`, `frame` (one hit at line 324 refers to "Web framework", not portals), `one-way`, `bidirectional`, `scale` (in the portal context). The README ([README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md)) does not mention portals. The World schema in API.yaml includes a `portals.portal_count` field (lines 343-349), but the README's Optional Feature table lists only world, user, and scene endpoints.
+The pinned API does not define a portal-traversal binding; the whitepaper names portals linking worlds on printed pages 14 and 21. Searches for the following terms in API.yaml at commit d39a1a0 return zero results: `destination`, `target`, `crossing`, `traversal`, `handoff`, `handshake`, `trigger`, `zone`, `prefetch`, `arrival`, `departure`, `exit-intent`, `frame` (one hit at line 324 refers to "Web framework", not portals), `one-way`, `bidirectional`, `scale` (in the portal context). The README ([README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md)) does not mention portals. The World schema in API.yaml includes a `portals.portal_count` field (lines 343-349), but the README's Optional Feature table lists only world, user, and scene endpoints.
 
 
 ## What fails without it
 
-**A portal graph with no links.** The canonical Portal has `id` and `geoPose` but no field that says where the portal leads. An implementer who builds a portal between World A and World B has no conformant way to express "this portal in World A leads to World B." The portal is a positioned point with no arrow. Two independently operated world servers cannot build a linked portal graph from the current schema. (Source: CM-009, verified against the spec.)
+**No shared destination binding.** The canonical Portal has `id` and `geoPose` but no defined destination member. An extension is schema-legal, yet two implementations need shared semantics to agree which world a portal names and how that identity resolves to endpoints. The architecture can describe linked worlds without this particular API binding being complete. (CM-009.)
 
-**No crossing protocol between worlds.** The specification defines read endpoints for worlds, users, views, portals, and spatial graphs, a delete endpoint for users, and full CRUD for spatial nodes, but defines no protocol for what happens when a user walks through a portal. There is no handshake, no state-transfer contract, no presence lifecycle at the boundary, and no correlation between a departure from one world and an arrival in another. Each implementer must invent a crossing protocol, and two implementations that do so independently will not interoperate. (Source: CM-015, CM-016, CM-017.)
+**No crossing protocol between worlds.** The specification defines read endpoints for worlds, users, views, portals, and spatial graphs, a delete endpoint for users, and full CRUD for spatial nodes, but defines no protocol for what happens when a user walks through a portal. There is no handshake, no state-transfer contract, no presence lifecycle at the boundary, and no correlation between a departure from one world and an arrival in another. Each implementer must invent a crossing protocol, and independent choices need not interoperate. (Source: CM-015, CM-016, CM-017.)
 
-**Arbitrary arrival position.** Without a defined pose mapping between source and target portal frames, the user arrives at an undefined position in the destination world. Camera heading and lateral offset relative to the portal aperture are lost. (Source: CM-011.)
+**Arbitrary arrival position.** Without a defined pose mapping between source and target portal frames, clients can choose different arrival positions. Camera heading and lateral offset have no shared preservation rule. (Source: CM-011.)
 
-**No trigger semantics.** The specification provides no vocabulary for when or how a portal crossing fires. Without trigger geometry (a volume, an aperture, a plane-crossing test), two implementations will disagree on the moment of activation. (Source: CM-026.)
+**No trigger semantics.** The specification provides no vocabulary for when or how a portal crossing fires. Without trigger geometry (a volume, an aperture, a plane-crossing test), two implementations can disagree on the moment of activation. (Source: CM-026.)
 
 **Ghost avatars after crossing.** Without a defined presence lifecycle at portal boundaries, a user who crosses from World A to World B can appear in both worlds simultaneously. The source world does not know the user left; the destination world does not know the user arrived. (Source: CM-018.)
 
@@ -68,7 +68,7 @@ The specification is silent on portal traversal. Searches for the following term
 
 Open Spatial Lab (OSL) implemented a portal traversal system as a set of labeled, non-canonical extensions to the Web of Worlds API. Every extension is annotated `x-osl-extension: true` in the OSL schema and every API response carries `standards_conformance: false` (source: OSL schema.yaml, x-osl-extension tags; OSL contract, proof-boundary policy). No conformance is claimed.
 
-**Portal destination.** OSL added a `PortalDestination` schema with `target_world_id`, `target_location_id`, `target_base_url`, and `spatial_fabric_address` (source: OSL schema.yaml lines 697-714). The destination rides on `OSLPortalResponse.destination`, an extension of the canonical Portal response (source: OSL schema.yaml lines 1099-1115). This is the field the canonical Portal does not have. It was proposed upstream as WO-018.
+**Portal destination.** OSL added a `PortalDestination` schema with `target_world_id`, `target_location_id`, `target_base_url`, and `spatial_fabric_address` (source: OSL schema.yaml lines 697-714). The destination rides on `OSLPortalResponse.destination`, an extension of the canonical Portal response (source: OSL schema.yaml lines 1099-1115). This is the field the canonical Portal does not have. It was proposed as a canonical addition.
 
 **Portal traversal controller.** OSL implemented a portal traversal controller that manages the full crossing lifecycle: trigger detection, exit-intent notification, pose mapping, root promotion, arrival notification, and presence handoff (source: live-adapter-portal-traversal-controller.mjs). The controller tracks portal frame geometry (position, forward, up, right, width, height, trigger depth), signed plane distance, oval aperture membership, crossing direction, and traversal mode (source: live-adapter-portal-traversal-controller.mjs lines 58-113).
 
@@ -76,15 +76,24 @@ Open Spatial Lab (OSL) implemented a portal traversal system as a set of labeled
 
 **Trigger geometry.** Portal trigger volumes are oval apertures with width, height, and trigger depth. A crossing commits when the avatar crosses the portal plane from an allowed entry side while inside the oval aperture (source: live-adapter-portal-traversal-controller.mjs lines 272-388). The detection uses signed-distance math against the portal plane.
 
-**Exit-intent and arrival notifications.** The controller posts two server notifications: POST /portal/exit-intent to the source world (returns a handoff_id) and POST /portal/arrival to the target world (carries the full handoff packet). The handoff_id is a correlation key that links exit to arrival (source: live-adapter-portal-traversal-controller.mjs lines 758-776, 978). These are labeled as non-load-bearing for the composition.
+**Exit-intent and arrival notifications.** The controller awaits POST /portal/exit-intent at the source before crossing. For a registered player, the request carries `player_id`; the source removes that presence record while issuing the handoff packet. POST /portal/arrival then sends the packet to the target, whose failure does not block visual composition. The target stores the client-supplied `handoff_id`; the inspected arrival handler does not authenticate it against the source. It correlates records, but is not proof that the source authorized a transfer (traversal controller lines 755–776 and 978–989; runtime-state.js lines 2929–2956 and 3048–3079).
 
-**One-avatar-per-world invariant.** Crossing follows depart-then-register: `presence.departPresence` on the source, then `presence.registerPresence` on the destination. The avatar is nulled on departure and re-created on arrival. A `continuity_id` survives the crossing (source: live-adapter-portal-traversal-controller.mjs lines 1192-1196).
+**Visual continuity and source-side presence removal.** The source's accepted exit-intent removes the identified player and starts a five-second departure tombstone. A heartbeat for that missing player cannot re-register it while the tombstone is active; an explicit registration can clear the tombstone. The controller later commits the destination scene, sends an idempotent departure confirmation, and registers at the destination. Losing only that later confirmation does not undo the earlier source removal. The retained September 7 client-only probe bypassed this server mechanism, so its two simulated registries are not a result for the two-server crossing (CM-018).
 
-**No-reload root promotion.** The child fabric is promoted to the root frame of the same JavaScript execution context via `promoteActiveEndpoint`. No page reload, no `location.assign()`, no URL navigation. The main-frame navigation count stays pinned at 1 (source: live-adapter-portal-traversal-controller.mjs lines 928-1017, which calls `promoteActiveEndpoint` imported from the live adapter module).
+The code separates failure cases:
 
-**Crossing continuity.** OSL identified four continuity ingredients: (1) prefetched scene swap is one-to-few-frames, (2) pose maps exactly via position subtraction, (3) the parent context does not vanish, (4) visual continuity is measured, not asserted (source: NAVIGATION-ARCHITECTURE.md lines 383-417).
+- If the exit-intent never reaches the source and the request fails, the client remains in the source world.
+- If the source accepts it but its reply is lost, the client can remain visually at the source while its presence record is absent. After the tombstone expires, a delivered heartbeat can restore the record.
+- If destination registration fails, a later delivered heartbeat can upsert the destination record. The nominal heartbeat interval is three seconds, not a guaranteed network recovery bound.
+- A pagehide beacon attempts departure. If a tab crashes or delivery fails, presence expires after its last accepted heartbeat: the default lease is ten seconds, the hidden-tab request is sixty seconds, and server bounds are one to sixty seconds.
 
-**IWPS-shaped handshake.** OSL built a post-hoc rendering of the crossing onto the OMA3 IWPS v0.3 Query-then-Teleport two-call protocol (source: iwps-query-teleport.mjs lines 1-95). The crossing genuinely makes two POSTs in IWPS order to two separate world servers. However, no IWPS parameter is on the wire: the request body is demo-native snake_case. The module itself documents this as a design study, not an implementation, and `iwps_conformance` stays false (source: iwps-query-teleport.mjs, IWPS_CONFORMANCE descriptor).
+These are code-derived failure paths, not a new network test. A heartbeat delayed beyond the five-second tombstone can use the upsert path again; the timer therefore supplies a bounded race guard, not global exclusivity under arbitrary delay. Visual continuity, per-world presence and session authority remain separate results.
+
+**No-reload root promotion.** The controller promotes the target in the same JavaScript execution context without requesting document navigation. The exact July 5 local three-window receipt recorded one main-frame navigation in each of the player, source-observer and target-observer windows. A later July 11 receipt with the same historical name is a different run and failed three stale handshake assertions. Neither receipt proves independent cross-engine interoperability.
+
+**Crossing continuity.** The local design preserves a visual avatar and maps a portal-relative pose during a prefetched scene swap. Visual commit occurs before the remaining arrival/presence work completes. The yaw-oriented demonstration does not establish arbitrary six-degree-of-freedom or scale-changing pose mappings.
+
+**IWPS-shaped handshake.** OSL built a post-hoc rendering of the crossing onto the OMA3 IWPS v0.3 Query-then-Teleport two-call protocol (source: iwps-query-teleport.mjs lines 1-95). The cited local crossing makes two POSTs in IWPS order to two separate world servers. However, no IWPS parameter is on the wire: the request body is demo-native snake_case. The module itself documents this as a design study, not an implementation, and `iwps_conformance` stays false (source: iwps-query-teleport.mjs, IWPS_CONFORMANCE descriptor).
 
 **Interaction volumes and traversal direction.** OSL added a `Zone` schema (kind, position, radius_m) and a `PortalTraversal` schema (mode: bidirectional/one-way, allowed_entry_side) as labeled extensions (source: OSL schema.yaml lines 854-880).
 
@@ -94,128 +103,72 @@ Open Spatial Lab (OSL) implemented a portal traversal system as a set of labeled
 
 **Node type discrimination.** OSL deferred canonical node-type discrimination. Portal destination on graph nodes is carried via a parseable `osl-portal:` spatialAssetURI and a labeled webofworlds_extension with `role:portal` (source: deferred-conformance-ledger DCL-010).
 
-**Evidence and claim boundary.** OSL documents 48 out of 48 portal crossings with continuity preserved (source: repo/open-spatial-lab/docs/WORKING-GROUP-DOSSIER.md). This count is documented by OSL and was not re-run in this verification pass; confidence is medium until re-run (source: proof-ledger.md, "48/48 crossing-continuity proof" entry). All evidence is local proof between two localhost world-server nodes; no claim is made about interoperation with independently operated servers. Every API response carries `standards_conformance: false`.
+**Evidence and claim boundary.** The retained crossing receipt contains 81 passing assertions from Node with two local backend instances, including two minted continuity identities. Its browser-machinery checks are source-presence tripwires, not browser execution. It is not a count of completed user journeys or a reliability estimate. Historical browser evidence is distinct from that contract run. No independent end-to-end interoperability claim is made; `standards_conformance` remains false.
 
 **Not attempted.** Native TeleportXR teleport was not tested. OSL is a browser-side viewer with application-level portal crossing between local origins. This is a disclosure, not a failure (source: wow-spec-coverage.mjs, entry oos.native_teleport; CM-024).
 
 
 ## Proposed normative text
 
-### Portal destination (MUST)
+All text and fragments below are unadopted proposals. The destination addition is the bounded base ask; the rest belongs to a separately agreed traversal profile. Schema fragments target OpenAPI 3.0.4.
+
+### Optional Portal destination
 
 ```yaml
-Portal:
+PortalWithDestination:
+  allOf:
+    - $ref: '#/components/schemas/Portal'
+    - type: object
+      properties:
+        destination:
+          $ref: '#/components/schemas/PortalDestination'
+PortalDestination:
   type: object
-  required:
-    - id
-    - destination
+  required: [target_world_id]
   properties:
-    id:
+    target_world_id:
       type: string
       format: uri
-    geoPose:
-      $ref: '#/components/schemas/GeoPose'
-    destination:
-      type: object
-      required:
-        - target_world_id
-      properties:
-        target_world_id:
-          type: string
-          format: uri
-          description: >
-            Identifier of the destination world.
-        target_base_url:
-          type: string
-          format: uri
-          description: >
-            Base URL of the destination world server.
-        target_portal_id:
-          type: string
-          description: >
-            Identifier of the linked portal in the destination world.
+      description: Proposed absolute URI identifying the target world; not automatically an API base.
+    target_base_url:
+      type: string
+      description: Optional service-base URI reference resolved against the Portal response retrieval URI.
+    target_portal_id:
+      type: number
+      description: Identifier of a Portal in the destination; preserves the canonical numeric Portal type.
 ```
 
-Rationale: without a destination, a portal cannot express where it leads and the graph of worlds has no edges.
+The referenced canonical `Portal.id` remains a number. `destination` is optional, so an existing `{"id":7}` remains valid. In the proposed schema a present destination must name a target; `{"destination":{}}` is invalid. This constrains a newly named member and must be versioned if earlier private extensions use that name differently.
 
-A conformant Portal MUST include a `destination` object with at minimum `target_world_id` (string, URI format). A Portal SHOULD include `target_base_url` so the client can resolve the destination server. A Portal MAY include `target_portal_id` to identify the linked portal in the destination world for pose mapping.
+### Target resolution and response behavior
 
+Proposed rule: return `destination` when the target is known. Resolve a relative `target_base_url` against the retrieval URI using the declared URI-reference rules, not text concatenation. Map `target_world_id` to the advertised service base through an agreed discovery/profile binding; do not assume every identifier is itself a fetchable API base. The relation between identity and endpoint must be checked according to the selected profile.
 
-### Portal response (MUST)
+An absent destination, unsupported scheme, unresolved identity, failed lookup or conflicting identity/base relation is an unresolved target. The client reports the reason and retains the current scene rather than guessing a world. Query and fragment semantics are preserved as described in [chapter 06](06-discovery-and-addressing.md). A stricter traversal profile could require a destination for traversable portals, but that would be a separate compatibility decision.
 
-GET /wow/portal/{portalId} MUST return the `destination` alongside the portal's position. The response SHOULD carry a human-readable `label`.
+### Pose mapping across portal frames (candidate traversal profile)
 
-Rationale: the portal endpoint is the client's only way to learn where a portal leads.
+The profile must define source and target frames, units, rotation convention and whether authored scale changes are allowed. For aligned distance components, use `target = source / sourceUnitsPerMeter * targetUnitsPerMeter`; 100 units at 100 units/metre becomes one unit at one unit/metre. Compose this with the agreed frame transform and any intentional model scale.
 
+A rigid portal profile can require preservation of lateral offset and heading by an isometry. That requirement cannot silently cover scale-changing portals. The local yaw-oriented mapping is useful evidence; an asymmetric six-degree-of-freedom fixture with a stated arrival tolerance is still needed.
 
-### Pose mapping across portal frames (MUST)
+### Crossing continuity (candidate traversal profile)
 
-A portal pair (source portal, linked target portal) MUST define an isometry: the user's position and heading relative to the source portal frame MUST map to the corresponding position and heading relative to the target portal frame. The mapping SHOULD preserve lateral offset and facing direction.
+A continuous-view profile should define the expected camera/avatar continuity and permitted visual interruption. Root precision changes and portal relocation are different cases; a portal may intentionally change the view. Prefetch and in-memory promotion are candidate techniques, not requirements for every WoW client.
 
-Rationale: without a defined pose mapping, the user arrives at an arbitrary position in the destination world.
+### Server-side exit and arrival notifications (protocol sketch)
 
+Open Spatial Lab sends exit-intent and arrival notifications correlated by a handoff identifier. The destination currently stores that client-asserted identifier without source authentication. A future profile could authenticate the source claim through a source-signed transfer packet, a source callback or another agreed mechanism; signing only the user manifest does not authenticate the whole handoff. A correlation identifier alone provides no transaction, retry or replay guarantee.
 
-### Crossing continuity (SHOULD)
+The proposed request content is a numeric `portal_id` at exit and a `handoff_id` at arrival, with source/target identity and pose/state fields bound by the selected profile. Before defining endpoints as interoperable, specify authentication, idempotency, duplicate handling, expiry, failed arrival recovery and observable status. This sketch is not a complete OpenAPI operation. In the actual local crossing path, failed arrival notification is logged and composition continues.
 
-A root-changing navigation MUST preserve camera pose continuity: the first frame after a root swap SHOULD render the same view from the same viewpoint, with only the underlying coordinate precision changed. A conformant client MAY implement verify-ahead prefetch to reduce the swap to one-to-few-frames.
+### Presence and authority during crossing (open profile decision)
 
-Rationale: a visible page-load stutter during portal crossing breaks the spatial illusion.
+Distinguish three invariants: one local visual avatar, one active session authority, and per-world presence records. The local source removes an identified player when accepting exit-intent, then uses a finite tombstone against stale heartbeat upserts. The later client departure is a confirmation. This reduces the dropped-confirmation race but does not make source removal and destination registration one distributed transaction.
 
+A candidate presence profile could require source removal when exit-intent is accepted and define the client's departure as idempotent confirmation. It must specify the permitted interval with no presence, tombstone lifetime, delayed-heartbeat behavior, failed-response recovery, retry identity and expiry. Test a lost exit-intent request, a lost reply after source acceptance, a lost destination registration and a delayed heartbeat against independently controlled endpoints. Globally exclusive session authority needs its own ownership protocol and failure model.
 
-### Server-side exit and arrival notifications (SHOULD)
-
-A world server SHOULD expose an exit-intent endpoint accepting a portal identifier and returning a handoff correlation identifier. A world server SHOULD expose an arrival endpoint accepting the handoff packet. The handoff identifier MUST be unique per crossing and MUST correlate exit to arrival.
-
-```yaml
-paths:
-  /wow/portal/exit-intent:
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - portal_id
-              properties:
-                portal_id:
-                  type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - handoff_id
-                properties:
-                  handoff_id:
-                    type: string
-                    format: uuid
-  /wow/portal/arrival:
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - handoff_id
-              properties:
-                handoff_id:
-                  type: string
-                  format: uuid
-```
-
-Rationale: without server notifications, the source world cannot update presence and the crossing has no audit trail.
-
-
-### One-avatar-per-world invariant (MUST)
-
-A conformant client MUST depart presence from the source world before registering presence in the destination world during a portal crossing. A `continuity_id` SHOULD survive the crossing to enable same-person correlation. A world server SHOULD enforce ghost-free presence via heartbeat TTL.
-
-Rationale: without depart-then-register ordering, a user can appear in two worlds at once.
-
+Open Spatial Lab also carries `continuity_id` across worlds, using `avatar_id` as a fallback. That linkage supports continuity but can correlate a visitor across destinations. A portable profile must choose crossing-scoped or pairwise identifiers, consent and retention rules under the whitepaper's data-minimization intent; the current identifier is not itself an authenticated identity claim.
 
 ### Node type discrimination (SHOULD)
 
@@ -237,6 +190,8 @@ PortalZone:
       enum: [prefetch, trigger]
     radius_m:
       type: number
+      minimum: 0
+      exclusiveMinimum: true
       description: >
         Radius in metres from the portal centre.
 ```
@@ -246,7 +201,7 @@ Rationale: without a trigger volume, two implementations will disagree on when a
 
 ### Portal trigger model (SHOULD, optional extension)
 
-The standard SHOULD define a portal trigger model: a planar aperture (dimensions, depth) centred on the portal's geoPose. A crossing triggers when an avatar's bounding point crosses the portal plane from an allowed entry side while inside the aperture. The standard MAY define one-way traversal via an `allowed_entry_side` property.
+The standard SHOULD define a portal trigger model: a planar aperture (dimensions, depth) in a declared local portal frame, mapped from GeoPose when georeferencing is supplied. A crossing triggers when an avatar's bounding point crosses the portal plane from an allowed entry side while inside the aperture. The standard MAY define one-way traversal via an `allowed_entry_side` property.
 
 Rationale: a deterministic, testable trigger model is needed for interoperable portal activation.
 
@@ -258,35 +213,28 @@ A Portal SHOULD support a `traversal` object with `mode` (bidirectional / one-wa
 Rationale: not all portals are bidirectional; spatial narratives require one-way doors.
 
 
-### No-reload crossing (SHOULD)
+### No-reload crossing (optional continuous-view profile)
 
-The standard SHOULD recommend that a conformant client implement portal crossings as in-memory root promotions rather than page reloads. The crossing MUST preserve the execution context, avatar state, and session cache. The crossing MUST NOT trigger a document navigation.
+An in-memory root promotion can preserve the local rig, camera and cache. A continuous-view profile may require the corresponding observable continuity, while leaving the mechanism to the client. A reload can preserve selected state if it is explicitly transferred; it is not forbidden by the base destination addition.
 
-Rationale: a page reload loses all client state (avatar equipment, presence registration, camera pose, session cache).
+### Crossing destination resolution (candidate graph-traversal profile)
 
+For a profile that renders the destination composition graph, resolve the optional destination using the agreed identity-to-service binding, fetch the canonical Spatial descriptor and its root node, or request an explicitly negotiated alternative. Report missing or unsupported graph/profile data without guessing. Other destination entry modes remain possible.
 
-### Crossing destination resolution (SHOULD)
-
-A portal crossing SHOULD resolve the destination world by fetching its composition graph (/wow/spatial) and composing a scene from it. The destination address MUST be resolved from the Portal.destination field. The crossing MUST NOT require a format-specific payload when the composition graph is sufficient.
-
-Rationale: the crossing must work between any two conformant world servers, not only those that serve a specific scene format.
+Rationale: the optional destination field identifies a target; it does not require every world to adopt this graph-rendering traversal profile or a particular scene format.
 
 
-### Policy gate before crossing (SHOULD)
+### Policy decisions before crossing
 
-A conformant client SHOULD implement a policy evaluation gate before committing a portal crossing. The gate MUST default to deny when the trust state is unknown or verification is incomplete.
-
-Rationale: a crossing that fires in an untrusted context bypasses the trust model.
-
+A profile must separate manifest signature validity, trusted identity assertions, fresh holder control, destination admission and content execution permission. For required signed-fabric verification, failure must refuse that fabric under the configured publisher-trust policy. This does not imply that every identity/notification failure stops the current prototype: its separate arrival path logs failed manifest verification and can still promote the target.
 
 ## Adoption path
 
-**Minimal world (what stays valid).** A world that serves the current Portal schema (id, geoPose) is not broken by these additions. The `destination` field is the only MUST-level addition to the Portal schema. A world that adds `destination` to its Portal responses becomes addressable in a portal graph. All other additions are SHOULD or MAY level and do not affect a minimal world.
+**Existing worlds.** The optional destination proposal preserves a Portal with numeric `id` and no destination. Such a response does not promise a traversable link. Requiring destination or changing the identifier type would narrow compatibility and is not part of the bounded ask.
 
-**What a client must do.** Read Portal.destination to learn where a portal leads. Implement depart-then-register presence at crossing boundaries. Map pose across portal frames using the isometry defined by the source and target portal geometry.
+**Clients.** Recognize the optional destination, apply the agreed resolution rules, and report unsupported or unresolved targets. Adopt a traversal profile only when its pose, continuity, admission and recovery behavior are agreed and advertised.
 
-**What a server must do.** Add `destination` (with at least `target_world_id`) to Portal responses. Optionally implement /wow/portal/exit-intent and /wow/portal/arrival for crossing correlation. Optionally enforce ghost-free presence via heartbeat TTL.
-
+**Servers.** Publish known destinations using the negotiated version/profile. Notifications and presence behavior need a shared failure contract before two endpoints can claim interoperable transfer. A heartbeat timeout is eventual cleanup, not exclusive ownership proof.
 
 ## Open questions for the working group
 
@@ -296,26 +244,18 @@ Rationale: a crossing that fires in an untrusted context bypasses the trust mode
 
 3. **Native TeleportXR teleport.** Does conformance require native TeleportXR teleport, or is application-level portal crossing a valid alternative? OSL is a browser-side viewer and did not attempt native TeleportXR teleport. This is a disclosure, not a failure (source: CM-024, wow-spec-coverage.mjs entry oos.native_teleport).
 
-4. **Canonical crossing semantics.** Should the specification define portal traversal semantics (handshake, state transfer, continuity), or is crossing purely implementation-defined? OSL built the full crossing, but the question of how much of it belongs in the standard is a group decision (source: CM-015).
+4. **Canonical crossing semantics.** Should the specification define portal traversal semantics (handshake, state transfer, continuity), or is crossing purely implementation-defined? OSL built a local visual crossing with best-effort notifications and presence; the profile boundary remains a group decision (source: CM-015).
 
 
 ## Sources
 
-- OpenSpatialWorld API specification (commit d39a1a0): [github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml)
-- OpenSpatialWorld README (commit d39a1a0): [github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md)
-- OSL WoW contract schema: repo/open-spatial-lab/wow-spec/schema.yaml
-- OSL portal traversal controller: repo/open-spatial-lab/web/live-adapter-portal-traversal-controller.mjs
-- OSL IWPS query-teleport module: repo/open-spatial-lab/web/iwps-query-teleport.mjs
-- OSL navigation architecture: repo/open-spatial-lab/docs/NAVIGATION-ARCHITECTURE.md
-- OSL deferred conformance ledger: repo/open-spatial-lab/.dev/ai/deferred-conformance-ledger.md
-- OSL upstream register: repo/open-spatial-lab/docs/UPSTREAM-REGISTER.md
-- OSL spec coverage: repo/open-spatial-lab/web/wow-spec-coverage.mjs
-- OSL working group dossier: repo/open-spatial-lab/docs/WORKING-GROUP-DOSSIER.md
-- OMA3 IWPS Base Specification v0.3 (referenced via OSL's iwps-query-teleport.mjs conformance descriptor)
-- Web of Worlds Completion Map (73 rows, 2026-09-07)
-- Findings and Recommendations (2026-09-07)
-
+- [OpenSpatialWorld/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenSpatialWorld/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf); relevant printed pages are identified in this chapter or [chapter 10](10-role-and-blind-spots.md).
+- OMA3 IWPS Base Specification v0.3, as identified by the retained iwps-query-teleport.mjs conformance descriptor. The local two-call design is not IWPS wire conformance.
+- Open Spatial Lab local source snapshot and retained evidence, checked September 7, 2026: schema.yaml, live-adapter-portal-traversal-controller.mjs, live-adapter-presence-controller.mjs, runtime-state.js, iwps-query-teleport.mjs, NAVIGATION-ARCHITECTURE.md, deferred-conformance-ledger.md and wow-spec-coverage.mjs. Source-side exit removal, the five-second tombstone and lease behavior were checked in code; they were not rerun over the network. The retained crossing receipt reports 81 Node assertions with two local backends; browser source-presence checks are not browser runs. The July 5 three-window browser receipt and failed July 11 successor are distinct historical results. Public reproduction of these exact local bytes is not established.
+- [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve the historical surface/finding identifiers.
 
 ## Change log
 
-2026-09-07: first public draft, verified.
+- 2026-09-07: corrected source scope, proposal compatibility and evidence boundaries; updated public citations.

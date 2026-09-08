@@ -1,247 +1,281 @@
 # Published Positions and Current State
 
-The Web of Worlds publications and the 2026-08-24 working-group meeting declare 49 positions: 4 vision principles, 5 core concepts, 5 core requirements, 16 API operations, 4 statements on the GitHub Pages home, 1 statement in the announcement post, 9 requirements from the initial blog post, and 5 governance structures. Of these, 20 are present in the specification text at commit d39a1a0 (the 16 API operations, the asset content-negotiation surface the whitepaper names, and three GitHub Pages statements about views, the composition graph, and registered model types), 17 are named but not yet defined (the README names them, a schema exists but carries no behavioural contract, or a publication declares them and the API text partially covers them), and 12 are aspirations with no specification text at all (the four principles, decentralized architecture, AI integration, and six requirements from the blog post that no API endpoint or schema addresses). For an implementer, the 20 present items are buildable from the specification alone. The 17 named-only items require inventing contracts. The 12 aspirations require inventing the entire mechanism.
-
-This document lists every declaration from the Web of Worlds publications in the reference set and the five governance structures described at the 2026-08-24 working-group meeting, shows what the specification text says at commit d39a1a0, and identifies which of our ten documents treats each one.
-
-## Status
-
-Publications checked on 2026-09-07.
-
-- **Whitepaper** (2026-Q1): live page byte-identical to the 2026-06-23 capture (file comparison; verified 2026-09-07T07:05Z and again at 08:12Z). Source repository HEAD 988f369b, unchanged since the capture.
-- **WoWAPI specification** at commit d39a1a0 (2026-05-21): upstream HEAD d39a1a0, equal to cited commit (verified by git ls-remote, 2026-09-07T07:05Z).
-- **simpleWorlds** reference implementation: HEAD d2bda3e vs cited 13d2cbe. This package cites simpleWorlds only for its URL path choice and, in document 10, for its two licence files; its code is not assessed.
-- **GitHub Pages home** (dated 2026-03-31): text changed since 2026-07-01 capture. Two changes to the visible text: "official Spatial Computing WG" became "new Spatial Computing WG"; the implementations table replaced HTMLModeWrapper with Open-Spatial-Lab. The MSF Project slides link target also changed. Updated capture saved as 2026-09-07-webofworlds-github-pages-home.html (the live page was byte-identical to it at 2026-09-07T08:12Z). Quotes below use the 2026-09-07 text where it differs.
-- **MSF announcement post** "Announcing the Web of Worlds whitepaper" (published 2026-06-03): article text identical to 2026-06-23 capture; only site-wide CSS and navigation menu items changed (verified 2026-09-07T07:05Z).
-- **MSF post** "Linked spatial experiences: the Web of Worlds" (published 2025-04-02, modified 2025-09-04): article text identical to 2026-06-23 capture; only site-wide CSS and navigation menu items changed (verified 2026-09-07T07:05Z).
-
-## How to read this document
-
-Each row below shows one declared position from a Web of Worlds publication. The four columns are:
-
-- **Declared**: the exact text from the publication, or a summary or paraphrase where the section says so.
-- **Source**: which publication, its version or date, and a public URL.
-- **In the text today**: what the specification text at commit d39a1a0 contains. "Present" means the API text defines this with an operation or schema (line number given). "Partial" means a schema or operation exists but does not carry the behavioural contract the declaration describes (line number given). "Absent" means the API text and README contain no reference (search terms given). Search terms were matched as whole words, case-insensitive; acronyms (AI, DID, SSO, TLS, MITM, CLA, SDO, HTTPS, JSON-LD) were matched case-sensitive; `scalab` is a stem and `create.*view` a pattern.
-- **Our document**: which of the ten documents in this package treats this item, with a link.
-
-The three classifications:
-
-- **Specified** (20): the API text defines the operation or schema with enough detail that an implementer can build it from the specification alone.
-- **Named only** (17): a publication names the feature or a schema exists, but the specification text does not define the behaviour, the contract, or the required fields.
-- **Aspiration** (12): the publications declare a vision or requirement that no API operation, schema, or README text addresses.
-
-
-## Whitepaper vision principles
-
-The whitepaper (2026-Q1) declares four Open Web Platform principles under "Vision." None appears in any API file. The entries below summarize the whitepaper text; colons replace the original formatting.
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 1 | Universality: Accessible on any device | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Absent. Search terms: `universality`, `adaptation`, `capability` (0 hits each in API.yaml and README.md). The term `device` returns 1 hit in API.yaml (L21, in the GET / summary, not a specification of the feature) and 2 in README.md (L7, the sentence under the Core Requirements heading, and L11, the Join world row; neither specifies the feature). | [01 Coordinate Precision, Units, and World Extents](https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md); [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| 2 | Interoperability: Consistent cross-platform experiences | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Absent. Search terms: `interoperability`, `cross-platform`, `consistent` (0 hits each in API.yaml). | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| 3 | Decentralization: No central authority | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Absent. Search terms: `decentralization`, `distributed`, `federation`, `DID` (0 hits each in API.yaml). | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md); [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| 4 | Accessibility: Inclusive by design | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Absent. Search terms: `accessibility`, `inclusive`, `a11y` (0 hits each in API.yaml, 0 in README.md). | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-
-Classification: all four are aspirations.
-
-
-## Whitepaper core concepts
-
-The whitepaper (2026-Q1) declares five core concepts under headings below the Vision list. The entries below summarize the whitepaper text; colons and commas replace the original formatting.
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 5 | Linked Spatial Experiences: Worlds are addressable via URIs (like web pages), Navigation through portals and links, Forms a network of connected virtual environments | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Partial. Portal schema exists ([API.yaml L409-436](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L409-L436)) but carries only `id` and `geoPose`. No target URI, no link destination, no navigation protocol. | [02 Portal Destination and Traversal](https://github.com/openspatials/msf-wow-completion-report/blob/main/02-portal-destination-and-traversal.md); [06 Discovery and Addressing](https://github.com/openspatials/msf-wow-completion-report/blob/main/06-discovery-and-addressing.md) |
-| 6 | Shared Spatial Assets: Modular, reusable 3D components, Built on existing standards (e.g. gltf, x3d, usd), Delivered via standard web infrastructure | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Present. OpenSpatialAsset API defines content negotiation across 21 IANA-registered model types ([OpenSpatialAsset/API.yaml L35-161](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L35-L161)) and an Asset metadata schema. | [07 Assets and the Render Seam](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md) |
-| 7 | Shared User Manifest (“Digital YOU”): A portable, user-controlled identity layer. Includes: Avatar and identity, Preferences and settings, Assets (wearables, credentials, NFTs). Powered by: Decentralized Identifiers (DIDs), Verifiable Credentials, Digital wallets | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Partial. OpenUserManifest API exists ([OpenUserManifest/API.yaml L32-60](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml#L32-L60)) but the UserManifest schema defines only three fields under a `content` object: `name` (string), `age` (number), `avatarAssetURI` (string). No preferences, settings, wearables, credentials, NFTs, DIDs, Verifiable Credentials, or wallets. | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md) |
-| 8 | Decentralized Architecture: No platform lock-in, User-owned data, Distributed storage and identity | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Absent. Search terms: `distributed`, `federation`, `DID`, `lock-in`, `user-owned` (0 hits each across all three API files). The APIs define centralized REST endpoints. | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| 9 | AI Integration: AI agents operate alongside humans. Enables: Automation, Spatial reasoning, Human-AI collaboration | Whitepaper, 2026-Q1 ([page](https://webofworlds.github.io/initial_MSF_Whitepaper/)) | Absent. Search terms: `AI`, `agent`, `automation`, `reasoning` (0 hits each in all three API files; README.md L7 has `User-Agent`, the HTTP user agent, not an AI agent). | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-
-Classification: concept 6 (Shared Spatial Assets) is specified. Concepts 5 and 7 are named only. Concepts 8 and 9 are aspirations.
-
-
-## README Core Requirements
-
-The OpenSpatialWorld README ([README.md L7-15](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md#L7-L15)) declares "Core Requirements and Feature" as a table with five rows.
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 10 | "Join world: URL, URL#join, URL#join=aspect.id: join the world as new or existing user on a given device and UA" | README.md L11, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md#L11)) | Partial. GET / serves text/html ([API.yaml L17-29](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L17-L29)), but the `#join` fragment behaviour is not defined anywhere in API.yaml. Search terms in API.yaml: `join` (1 hit in info.description L5, not a specification of the fragment verb), `fragment` (0 hits). | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md); [06 Discovery and Addressing](https://github.com/openspatials/msf-wow-completion-report/blob/main/06-discovery-and-addressing.md) |
-| 11 | "Follow world: URL#follow, URL#follow=aspect.id: follow the world as new or existing user" | README.md L12, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md#L12)) | Absent. Search terms in API.yaml: `follow` (0 hits), `fragment` (0 hits). No endpoint or fragment-handling behaviour defined. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md); [06 Discovery and Addressing](https://github.com/openspatials/msf-wow-completion-report/blob/main/06-discovery-and-addressing.md) |
-| 12 | "Preview world: URL#preview, #preview=aspect.id: experence world without" | README.md L13, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md#L13)) | Absent. The description is truncated mid-sentence in the source (verbatim: "experence world without"). Search terms in API.yaml: `preview` (0 hits), `fragment` (0 hits). | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md); [06 Discovery and Addressing](https://github.com/openspatials/msf-wow-completion-report/blob/main/06-discovery-and-addressing.md); [09 Conformance Vocabulary and Errata](https://github.com/openspatials/msf-wow-completion-report/blob/main/09-conformance-vocabulary-and-errata.md) |
-| 13 | "Persist world: store or bookmark URL" | README.md L14, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md#L14)) | Absent. Defined as browser-side bookmarking. No server-side persistence API. Search terms in API.yaml: `persist` (0 hits), `bookmark` (0 hits). The description column is empty in the source table. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-| 14 | "Share world: send URL to second user" | README.md L15, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md#L15)) | Absent. Defined as external URL sharing. No sharing endpoint. Search terms in API.yaml: `share` (1 hit in info.description L5, not a sharing endpoint), `send` (0 hits). The description column is empty in the source table. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-
-Classification: row 10 (Join) is named only (the GET / endpoint exists but the fragment verb is not defined). Rows 11-14 are named only (the README names them but no API endpoint or behaviour is defined).
-
-
-## API.yaml declared surfaces
-
-The three API files define 16 operations across three services. All 16 are present in the specification text with defined request/response shapes.
-
-### OpenSpatialWorld API (v0.0.1)
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 15 | "GET /: Provisions a web application to deliver the spatial experience on the given device" | API.yaml L17-29, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L17-L29)) | Present. Returns text/html. Operation: getDefaultApp. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-| 16 | "GET /wow/world: Returns a World status as a single data state" | API.yaml L32-44, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L32-L44)) | Present. World schema at L268-349 includes content, geoPose, presence, technology, users, views, portals. | [01 Coordinate Precision, Units, and World Extents](https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md) |
-| 17 | "GET /wow/user/{userId}: Returns a User status" | API.yaml L47-66, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L47-L66)) | Present. User schema at L351-380: id, name, AvatarURI, geoPose. | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md) |
-| 18 | "DELETE /wow/user/{userId}: Deletes a user" | API.yaml L67-85, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L67-L85)) | Present. Returns 200 on success, 400 on invalid user value. | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md) |
-| 19 | "GET /wow/view/{viewId}: Returns a Viewpoint status" | API.yaml L88-107, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L88-L107)) | Present. View schema at L382-407: id, geoPose. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-| 20 | "GET /wow/portal/{portalId}: Returns a Portal status" | API.yaml L110-129, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L110-L129)) | Present. Portal schema at L409-436: id, geoPose. No destination URI or link target. | [02 Portal Destination and Traversal](https://github.com/openspatials/msf-wow-completion-report/blob/main/02-portal-destination-and-traversal.md) |
-| 21 | "GET /wow/spatial/{spatialID}: Returns a single Spatial status as a single data state" | API.yaml L133-153, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L133-L153)) | Present. Spatial schema at L438-468: id, rootNodeID, geoPose. | [08 Composition Graph Schema Fixes](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md) |
-| 22 | "POST /wow/spatial/{spatialID}/node/{nodeId}: Create and add new nodes." | API.yaml L156-188, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L156-L188)) | Present. Accepts array of Node objects under parent nodeId. | [08 Composition Graph Schema Fixes](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md) |
-| 23 | "GET /wow/spatial/{spatialID}/node/{nodeId}: Returns a single Node tree as a single data state" | API.yaml L189-207, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L189-L207)) | Present. Returns Node tree from nodeId. | [08 Composition Graph Schema Fixes](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md) |
-| 24 | "PUT /wow/spatial/{spatialID}/node/{nodeId}: Update an existing node." | API.yaml L208-241, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L208-L241)) | Present. Full node replacement. | [08 Composition Graph Schema Fixes](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md) |
-| 25 | "DELETE /wow/spatial/{spatialID}/node/{nodeId}: Deletes a node" | API.yaml L242-260, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L242-L260)) | Present. Returns 200 on success, 400 on invalid node value. | [08 Composition Graph Schema Fixes](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md) |
-
-### OpenSpatialAsset API (v0.0.1)
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 26 | "HEAD /: Used to authorize resources and simultaneously check whether ETag still matches cached ETag." | OpenSpatialAsset/API.yaml L19-34, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L19-L34)) | Present. Returns 200 with ETag, 403 Forbidden, or 404 Not Found. | [07 Assets and the Render Seam](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md) |
-| 27 | "GET /: Used to negotiate and fetch a data instance as resources." (content negotiation across 21 model types) | OpenSpatialAsset/API.yaml L35-161, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L35-L161)) | Present. 21 IANA-registered model types including gltf-binary, gltf+json, x3d+xml, vnd.usda, vnd.usdz+zip, step, vnd.collada+xml, vrml. | [07 Assets and the Render Seam](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md) |
-| 28 | "GET /wow/asset: Returns a asset status as a single data state" | OpenSpatialAsset/API.yaml L162-179, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L162-L179)) | Present. Asset schema includes content (label, age_restriction, license, cost, version) and geoPose. | [07 Assets and the Render Seam](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md) |
-
-### OpenUserManifest API (v0.0.1)
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 29 | "HEAD /: Used to authorize resources and simultaneously check whether ETag still matches cached ETag." | OpenUserManifest/API.yaml L16-31, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml#L16-L31)) | Present. Same authorization pattern as OpenSpatialAsset. | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md) |
-| 30 | "GET /: Returns a user manifest as a single data state" | OpenUserManifest/API.yaml L32-60, commit d39a1a0 ([link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml#L32-L60)) | Present. UserManifest schema has three fields under a content object: name (string), age (number), avatarAssetURI (string). | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md) |
-
-Classification: all 16 API operations are specified. The operations define request/response shapes; the schemas they reference are present but carry no required properties, no RFC 2119 keywords, and no behavioural contracts. These gaps are addressed in documents 01-09.
-
-
-## GitHub Pages home
-
-The WebOfWorlds GitHub Pages home (dated 2026-03-31, [page](https://webofworlds.github.io/)) restates the whitepaper's positions with additional detail on spatial worlds, user manifest, and spatial assets. Most declarations overlap with the whitepaper core concepts already listed above; this section covers the additional or differently-worded declarations.
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 31 | "Portals stores links to external and independent world instance" | GitHub Pages home, 2026-03-31 ([page](https://webofworlds.github.io/)) | Partial. Portal schema exists ([API.yaml L409-436](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L409-L436)) with id and geoPose, but no destination URI or link target. The portal cannot store a link to an external world. | [02 Portal Destination and Traversal](https://github.com/openspatials/msf-wow-completion-report/blob/main/02-portal-destination-and-traversal.md) |
-| 32 | "Views to expose a viewing pose or camera to the consumer" | GitHub Pages home, 2026-03-31 ([page](https://webofworlds.github.io/)) | Present. View schema at [API.yaml L382-407](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L382-L407) defines id and geoPose, accessible via GET /wow/view/{viewId}. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-| 33 | "Spatial Composition Graph hieratical structure to manage any number of spatial assets links" (verbatim, including "hieratical") | GitHub Pages home, 2026-03-31 ([page](https://webofworlds.github.io/)) | Present. Spatial and Node schemas with CRUD operations at [API.yaml L133-260](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L133-L260). Node.spatialAssetURI carries the asset link. | [08 Composition Graph Schema Fixes](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md) |
-| 34 | "RFC2077 standard and its associated model content registrations have formed a robust foundation on the existing web" | GitHub Pages home, 2026-03-31 ([page](https://webofworlds.github.io/)) | Present. OpenSpatialAsset API negotiates IANA-registered model media types, the model top-level type that RFC 2077 defined; its externalDocs (L13-15) point to the IANA list ([OpenSpatialAsset/API.yaml L35-161](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L35-L161)). | [07 Assets and the Render Seam](https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md) |
-
-Classification: rows 32, 33, 34 are specified (present). Row 31 is named only (partial).
-
-
-## MSF announcement post
-
-"Announcing the Web of Worlds whitepaper: a concrete path to the open metaverse" (published 2026-06-03, [post](https://metaverse-standards.org/news/blog/announcing-the-web-of-worlds-whitepaper-a-concrete-path-to-the-open-metaverse/)). This post largely restates the whitepaper and names the three APIs. One declaration adds specificity beyond the whitepaper.
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 35 | "Open User Manifest API (The “Digital YOU”): Powers a portable, user-controlled identity layer. Utilizing JSON-LD, Decentralized Identifiers (DIDs), and Verifiable Credentials, users can carry their avatars, preferences, and assets across different virtual worlds." | Announcement post, 2026-06-03 ([post](https://metaverse-standards.org/news/blog/announcing-the-web-of-worlds-whitepaper-a-concrete-path-to-the-open-metaverse/)) | Partial. OpenUserManifest API exists ([OpenUserManifest/API.yaml L32-60](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml#L32-L60)) but the schema defines three fields only (name, age, avatarAssetURI). Search terms for the declared scope, in the three API files and README.md: `JSON-LD` (0 hits in the API files; 1 hit in README.md L21 as an example container for world status, not for the user manifest), `DID` (0 hits), `credential` (0 hits), `wallet` (0 hits), `preference` (0 hits). | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md) |
-
-Classification: named only (the API exists but the declared scope far exceeds the defined surface). The announcement's other positions (three APIs, OWP values, AI collaboration) overlap with whitepaper entries 6, 7, 8, 9 above.
-
-
-## MSF post: "Linked spatial experiences: the Web of Worlds"
-
-Published 2025-04-02, modified 2025-09-04 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)). This is the earlier post that defined the core requirements before the whitepaper. It carries nine requirements that the whitepaper and the announcement post do not restate in the same terms.
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| 36 | "Capability to handle billions of addressable spatial data states" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. Search terms: `billion`, `scale`, `scalab`, `capacity` (0 hits each in API.yaml and README.md). The API uses integer IDs with no stated range. | [01 Coordinate Precision, Units, and World Extents](https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md); [08 Composition Graph Schema Fixes](https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md) |
-| 37 | "Experience consistency, e.g., in view and navigation parameters, units, physics" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. Search terms: `units` (0 hits), `physics` (0 hits), `consistency` (0 hits), `navigation` (1 hit: World.presence.navigation, a bare string with no definition at [API.yaml L312](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L312)). | [01 Coordinate Precision, Units, and World Extents](https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md) |
-| 38 | "Seamless shared multi-user and multi-device scenarios" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. Search terms: `multi-user` (0 hits), `multi-device` (0 hits), `shared` (0 hits in API.yaml). World.users carries active_user_count and total_user_count as static counters ([API.yaml L325-335](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L325-L335)) but no multi-user protocol. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-| 39 | "Support for mixed and dynamic user and device configurations e.g., desktop, mobile, and immersive devices" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. Search terms: `mobile` (0 hits), `desktop` (0 hits), `immersive` (1 hit: World.technology.webXR-immersive, a bare string at [API.yaml L319-321](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L319-L321) with description "WebXR session profile" but no device-adaptation mechanism). | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| 40 | "World-agnostic user identification and data authentication (e.g., SSO)" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. Search terms: `SSO` (0 hits), `authentication` (0 hits), `identity` (0 hits), `login` (0 hits) in all three API files. HEAD / on OpenSpatialAsset and OpenUserManifest returns 200/403/404 but defines no authentication mechanism. | [03 Portable User State and Identity](https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md) |
-| 41 | "Ability to jump to predefined viewpoints in worlds" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Partial. View schema exists with geoPose ([API.yaml L382-407](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L382-L407)), but no "jump" or navigation mechanism is defined. Search terms: `jump` (0 hits), `navigate` (0 hits), `teleport` (0 hits). | [06 Discovery and Addressing](https://github.com/openspatials/msf-wow-completion-report/blob/main/06-discovery-and-addressing.md) |
-| 42 | "Creation and sharing of new viewpoints" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. GET /wow/view/{viewId} exists but no POST or PUT for views. Search terms: `create.*view` (0 hits), no write operation on the view path. | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-| 43 | "Security, e.g., protection against Man in the Middle attacks" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. Search terms: `security` (0 hits), `MITM` (0 hits), `TLS` (0 hits), `HTTPS` (0 hits in API.yaml). The OpenSpatialWorld test server URL uses `http://` not `https://` ([API.yaml L9](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L9)); the OpenSpatialAsset and OpenUserManifest server URLs use `https://` (L10 in each file). | [04 Provenance and Signed Subtrees](https://github.com/openspatials/msf-wow-completion-report/blob/main/04-provenance-and-signed-subtrees.md) |
-| 44 | "Automatic user ID controlled join/rejoin management" | Linked-spatial post, 2025-04-02 ([post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/)) | Absent. The User schema exists but no session lifecycle, no join/rejoin protocol, no user-creation endpoint. Search terms: `rejoin` (0 hits), `session` (1 hit: "WebXR session profile", not session management). | [05 Presence, Live Sync, and Persistence](https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md) |
-
-Classification: rows 36, 37, 38, 39, 40, 43 are aspirations. Rows 41, 42, 44 are named only.
-
-
-## Governance (from working-group meetings)
-
-Five governance structures were described at the 2026-08-24 working-group meeting. None has a formal document. The transcript is not public; the entries below paraphrase what was said and give the transcript line for the record.
-
-| # | Declared | Source | In the text today | Our document |
-|---|----------|--------|-------------------|--------------|
-| G1 | An initiative hub, modelled on the Khronos structure, to manage external open source projects; the hub is to live in the Metaverse Standards Forum infrastructure and link to the projects | 2026-08-24 working-group meeting, transcript lines 109 and 605 | Absent. Search terms: `hub`, `initiative`, `governance` (0 hits each in all three API files and README.md). | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| G2 | A business council on the Forum side, brokering between developer communities and standards bodies; the meeting noted that nothing is written yet on how it is built | 2026-08-24 working-group meeting, transcript lines 141, 613, and 655 | Absent. Search terms: `business council`, `council`, `business` (0 hits each in all three API files and README.md). | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| G3 | An external maintainer council that manages the maintainers who work on the code and the APIs; its relationship to the hub was described as still open | 2026-08-24 working-group meeting, transcript lines 145-147 (cues 36-37) | Absent. Search terms: `maintainer`, `council` (0 hits each in all three API files and README.md). The term `external` has 1 hit in README.md (L27, a scene part linked in an external world, not a governance body) and appears as the OpenAPI key `externalDocs` at OpenSpatialAsset/API.yaml L13. The council is external to the Metaverse Standards Forum. | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| G4 | An open source licence with a contributor licence agreement (CLA), stated as the one already used for the API and the two open source implementations | 2026-08-24 working-group meeting, transcript line 157 (cue 39) | Absent. Search terms: `license` (2 hits: World.content.license at [API.yaml L278](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml#L278) and Asset.content.license at [OpenSpatialAsset/API.yaml L190](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L190), both content properties, not a project licence declaration), `CLA` (0 hits). Apache-2.0 appears in the repository LICENSE file but not in the specification text. | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-| G5 | A point of contact that brokers between the developer communities and the standards development organizations (SDOs) | 2026-08-24 working-group meeting, transcript line 213 (cue 53) | Absent. Search terms: `SDO`, `liaison`, `broker` (0 hits each in all three API files and README.md). No liaison protocol defined. | [10 Role and Blind Spots](https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md) |
-
-Classification: all five are named only (verbally declared, no written document).
-
-
-## Where the publications and the text agree
-
-The specification text and the publications agree in these areas, and the specification carries enough detail to build from:
-
-- The three-API structure (OpenSpatialWorld, OpenSpatialAsset, OpenUserManifest) matches the three core pillars the announcement post names (Open Spatial World, Open User Manifest, Open Spatial Asset) and the whitepaper's core concepts of linked spatial experiences, shared spatial assets, and the shared user manifest. Each API exists with defined operations.
-- The spatial composition graph has full CRUD: GET, POST, PUT, DELETE on nodes under a spatial root. The recursive Node schema with parent, children, localTransform, spatialAssetURI, and appearanceURI carries the structure the whitepaper names.
-- The OpenSpatialAsset content-negotiation surface covers 21 IANA-registered model types, fulfilling the whitepaper's "Built on existing standards (e.g. gltf, x3d, usd )" declaration (quoted as written).
-- The GeoPose structure appears on World, User, View, Portal, Spatial, and Asset, providing the spatial anchoring the architecture diagrams show.
-- The ETag-based authorization on OpenSpatialAsset and OpenUserManifest (HEAD / returning 200/403/404) provides a starting point for the access control the publications describe.
-
-
-## Where the text has not yet caught up with the publications
-
-Seventeen declarations are named in the publications but not yet defined in the specification text. Twelve more are aspirations with no specification text at all.
-
-Named-only items that could become specified with targeted additions:
-
-- Portal destination: the portal has a position but cannot say where it leads.
-- Fragment verbs (join, follow, preview): named in the README table, not defined in the API.
-- User manifest scope: the API exists but carries three fields where the publications describe a full identity layer with DIDs, credentials, and wallets.
-- Viewpoint navigation: views can be read but not created, and no "jump to viewpoint" mechanism exists.
-- Session lifecycle: the README declares "continuous spatial experience and session" but no session lifecycle is defined.
-- Governance: five structures were described in a working-group meeting; none has a formal document.
-
-Aspirations that would require new specification work:
-
-- The four vision principles (universality, interoperability, decentralization, accessibility) have no specification text of any kind.
-- AI integration has no API surface.
-- Multi-user/multi-device, SSO, experience consistency, security, and billions-scale addressing were declared in the 2025 blog post and have no specification text.
-
-
-## Open questions for the working group
-
-1. Which of the 17 named-only items does the working group intend to specify next? The portal destination and the fragment verb grammar are the smallest additions with the largest impact for implementers.
-2. The linked-spatial-experiences post (2025) declares requirements that the whitepaper (2026) does not repeat: experience consistency, security, billions-scale addressing, multi-user/multi-device. Are these still active requirements?
-3. The GitHub Pages implementations table now lists Open-Spatial-Lab (Apache-2.0, Level 5, gltf-binary) where HTMLModeWrapper previously appeared. What are the level definitions, and is the working group maintaining a compliance matrix?
-4. The governance structures described on 2026-08-24 (initiative hub, business council, maintainer council, licence/CLA, SDO liaison) have no formal document. When is a governance document expected?
-
-
-## Sources
-
-### Publications (the reference set)
-
-- Whitepaper: "initial Web of World Whitepaper", 2026-Q1. Page: https://webofworlds.github.io/initial_MSF_Whitepaper/ . PDF: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf . Source: https://github.com/WebOfWorlds/initial_MSF_Whitepaper (HEAD 988f369b on 2026-09-07).
-- MSF announcement: "Announcing the Web of Worlds whitepaper: a concrete path to the open metaverse", 2026-06-03. https://metaverse-standards.org/news/blog/announcing-the-web-of-worlds-whitepaper-a-concrete-path-to-the-open-metaverse/
-- MSF post: "Linked spatial experiences: the Web of Worlds", 2025-04-02. https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/
-- GitHub Pages home, dated 2026-03-31. https://webofworlds.github.io/
-- Specification: https://github.com/WebOfWorlds/WoWAPI at commit d39a1a0 (2026-05-21), equal to upstream HEAD on 2026-09-07.
-- Reference implementation (named only, not assessed): https://github.com/WebOfWorlds/simpleWorlds at commit 13d2cbe (HEAD d2bda3e on 2026-09-07).
-
-### Specification files cited
-
-- OpenSpatialWorld/API.yaml: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml
-- OpenSpatialWorld/README.md: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md
-- OpenSpatialAsset/API.yaml: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml
-- OpenUserManifest/API.yaml: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml
-
-### Our documents
-
-- 01: https://github.com/openspatials/msf-wow-completion-report/blob/main/01-coordinate-precision-units-and-extents.md
-- 02: https://github.com/openspatials/msf-wow-completion-report/blob/main/02-portal-destination-and-traversal.md
-- 03: https://github.com/openspatials/msf-wow-completion-report/blob/main/03-portable-user-state-and-identity.md
-- 04: https://github.com/openspatials/msf-wow-completion-report/blob/main/04-provenance-and-signed-subtrees.md
-- 05: https://github.com/openspatials/msf-wow-completion-report/blob/main/05-presence-live-sync-and-persistence.md
-- 06: https://github.com/openspatials/msf-wow-completion-report/blob/main/06-discovery-and-addressing.md
-- 07: https://github.com/openspatials/msf-wow-completion-report/blob/main/07-assets-and-the-render-seam.md
-- 08: https://github.com/openspatials/msf-wow-completion-report/blob/main/08-composition-graph-schema-fixes.md
-- 09: https://github.com/openspatials/msf-wow-completion-report/blob/main/09-conformance-vocabulary-and-errata.md
-- 10: https://github.com/openspatials/msf-wow-completion-report/blob/main/10-role-and-blind-spots.md
-
-## Change log
-
-2026-09-07: first public draft, verified twice.
+Web of Worlds has a substantial published architecture. Its current machine-readable specification defines world resources, individual node operations, asset delivery and manifest access. Several published behaviors still need a common binding or an agreed profile. An omitted API field does not mean the authors omitted the idea.
+
+This comparison reads the complete named publication set: the 33-page whitepaper, its separate executive-summary page, both Metaverse Standards Forum posts, the WebOfWorlds home page, and the specification at commit `d39a1a009aa4ef8fb6d14aa66d588cffb74c33de`. The source-by-source account below makes the coverage inspectable. It includes material that the earlier summary-based register missed.
+
+There are **76 active public-source comparison entries**. The original public identifiers 1–44 remain traceable; four repeated declarations are now aliases, and 36 entries, 45–80, supply the missing coverage. **Five meeting notes, G1–G5, remain separate context.** Thus the document retains 80 public identifiers, of which four are aliases, plus five meeting identifiers. These are units of this register, not a completeness percentage, a count of normative requirements, or a measure of working interoperability. The former split of 20 “specified,” 17 “named only” and 12 “aspirations” is retired.
+
+## Status and source versions
+
+Draft for working-group review, 2026-09-07. Proposals in the report are unadopted. Primary-source checks at 13:37–13:38 UTC returned the following versions:
+
+| Source | Exact reference and check |
+|---|---|
+| Full whitepaper | [The Web of Worlds (WoW) Whitepaper][P], dated **2026-03-31**, 33 printed pages; SHA-256 `a43200294fb15ca6bfa80f93a1ee810eba2c010f76a88d39affde0cfd179110a`. The retained September 7 PDF bytes were checked again for this comparison. |
+| Executive summary | [Initial whitepaper page][S], labelled 2026-Q1. This is a separate, shorter text, not the full paper. The [source repository][PR] HEAD was `988f369b0af206de0a7b53e7903dd55e08be80a0`. |
+| Announcement | [Announcing the Web of Worlds whitepaper][A]. Visible date June 2, 2026; page metadata gives `2026-06-03T01:40:32+00:00`. Both identify the same post. |
+| Earlier post | [Linked spatial experiences: the Web of Worlds][L], published April 2, 2025; metadata modified September 4, 2025. |
+| Home page | [WebOfWorlds][H], captured September 7, 2026. March 31 is the whitepaper's date shown on this page, not a version date for all home-page content. Site repository HEAD was `6f14cd37823bd7c4c698f94a97893366e4dc07f3`. |
+| API specification | [WoWAPI][API], version 0.0.1 at `d39a1a009aa4ef8fb6d14aa66d588cffb74c33de`, May 21, 2026. The upstream HEAD matched at the stated check time. OpenSpatialWorld declares OpenAPI **3.0.4**; OpenSpatialAsset and OpenUserManifest declare **3.0.3**. All three API files and five READMEs were read. |
+| Reference implementation | [simpleWorlds][SW] is context. Only its published README/API path declarations at `13d2cbea991e17df0b14857f11f693712e6171cb` are compared; implementation internals and conformance are not assessed. The earlier September 7 HEAD check returned `d2bda3e2e73097c6e36ae0fd65a935cb3064ce71`. That later revision does not silently replace the pinned example. |
+
+The [method and source record][M] gives capture hashes, tests, historical evidence and limits. Dates and version checks describe these sources at the stated time; they do not assert the current release status of every technology or implementation mentioned by a publisher.
+
+## What a comparison entry means
+
+One entry is a coherent architectural position, requested behavior, process commitment, or method-and-path API operation. Related examples stay together when their API comparison and acceptance boundary are the same. A distinct operation or materially different behavior receives its own entry. This preserves the original mixed architectural and operation-level inventory without presenting it as an atomic requirements count.
+
+Repeated wording across publications maps to the same entry. The four repeated subjects retained as aliases are listed below; added source detail stays visible in the active rows. The audit includes substantive declarations in prose, requirement lists, tables, diagrams and examples. General history, background descriptions of other organizations, bibliography entries and invitations to participate are accounted for as context; they are not invented WoW requirements. Linked publications outside this named set are not silently included.
+
+Each row separates:
+
+- **Published position and locator:** a concise paraphrase and exact page, heading or API lines. Paper pages use printed page numbers, which match PDF page numbers.
+- **Current binding:** what the pinned API or README actually defines, followed by the unresolved part. “No binding located” is limited to these reviewed files; it never means no architecture, implementation or external standard exists.
+- **Local evidence:** its class, not a certification. “Source only” means this report supplies no behavior test for that declaration. “Historical local” means retained implementation evidence, not a fresh rerun. The named retained September 7 probes have the limits in [METHOD][M].
+- **Report treatment:** the chapter that discusses the relevant evidence or proposal; it does not mean that chapter completes the declared behavior.
+
+The [summary][S] lists universality, interoperability, decentralization and accessibility. The [full paper, p4][P04] lists universality, decentralization, open standards and accessibility. Entries 1–4 preserve both versions rather than attributing the summary’s exact list to the paper.
+
+## Original public declarations, with corrected comparisons
+
+| ID | Published position and locator | Current binding and remaining question | Local evidence | Report treatment |
+|---|---|---|---|---|
+| 1 | Device-independent access. [Summary, Vision][S]; [Paper pp2–4][P02]; [Earlier post, Universal Experience Accessibility][L]. | [World GET /][W17] serves an application; [technology metadata][W316] names runtime and immersive session profile. Neither establishes all-device adaptation or accessibility. | Historical local browser use; no all-device acceptance. | [01, frames][R01]; [10, role][R10]. |
+| 2 | Interoperability through open standards. [Summary, Vision][S]; [Paper p4, Core Principles][P04]. The full paper calls the corresponding principle **open standards**. | Three open API descriptions exist. Interoperability of a selected behavior still needs compatible profiles and independent outcomes. | Source only for the cross-platform promise. | [09, conformance][R09]; [10, role][R10]. |
+| 3 | No single authority. [Summary, Vision][S]; [Paper p4][P04]. | Separate service endpoints and URI-linked assets are compatible with distributed deployment. They do not specify governance, data custody or resolver trust. REST does not imply a single central authority. | Source only. | [03, identity][R03]; [10, role][R10]. |
+| 4 | Inclusive access. [Summary, Vision][S]; [Paper p4][P04]. | [Application delivery][W17] is a foundation; no accessibility profile or success criteria are bound in the reviewed API descriptions. | No accessibility acceptance test. | [10, open questions][R10]. |
+| 5 | Worlds link through portals and URIs. [Summary, Linked Spatial Experiences][S]; [Paper pp14,21][P21]; [Home, The Spatial Worlds][H]. | [Portal][W409] has numeric `id` and `geoPose`, with a [read endpoint][W110]. It permits extra properties but defines no interoperable destination property, resolution rule or traversal protocol. | Historical local crossing; source-server presence removal and the isolated-controller probe are distinguished in [METHOD][M]. | [02, destination and traversal][R02]; [06, addressing][R06]. |
+| 6 | Reuse existing asset formats and web delivery. [Summary, Shared Spatial Assets][S]; [Paper p15][P15]; [Home, The Spatial Asset][H]. | [Asset GET /][A35] declares 21 model response media types. That is a negotiated delivery surface, not proof every renderer supports every format or preserves behavior. | Historical local asset loading; no all-format test. | [07, asset profile][R07]. |
+| 7 | Portable, user-controlled manifest with identity, preferences and assets. [Summary, Shared User Manifest][S]; [Paper pp9–11,15][P15]; [Announcement, Technical Stack][A]. | [Manifest GET / and schema][U32] define `content.name`, `age`, `avatarAssetURI`; [HEAD /][U16] defines resource-access results. No shared JSON-LD context, credential exchange, holder challenge or preference semantics is bound here. | Retained September 7 signing probe establishes signed-byte integrity only. | [03, portable state and assurance][R03]. |
+| 8 | Distributed data and identity without platform lock-in. [Summary, Decentralized Architecture][S]; [Paper pp10,16–17][P17]. | [Asset URI fields][W471] allow links; [asset and manifest services][API] are separate. Decentralized storage, method resolution and federation remain architecture/profile questions. | No distributed deployment acceptance. | [06, resolution][R06]; [10, role][R10]. |
+| 9 | Human and AI participants share methods. [Summary, AI Integration][S]; [Paper pp9,11,25,27][P25]; [Announcement, Human-AI Collaboration][A]. | Existing [node read/write operations][W156] are not human-specific. The API does not bind an AI identity/permission profile or the five computing operators in entries 63–67. | No human/AI interoperability test. | [10, agent role][R10]; [08, graph][R08]. |
+| 10 | Join through URL or `#join`. [World README L7–11][WR07]; [Paper p28][P28]. | [GET /][W17] delivers an application. The README uses `aspect.id`; the paper illustrates `#join=view.5845` within an example that also contains stray punctuation. The sources establish a dotted kind/id intention, but leave a complete grammar, identity selection, re-entry and failure rules to define. | Historical local entry/crossing, using local conventions. | [05, sessions][R05]; [06, fragments][R06]. |
+| 11 | Follow through `#follow`. [World README L12][WR07]. | The README names following. No follower lifecycle, stream or synchronization binding was located in the World API. | No follow-profile acceptance. | [05, sessions][R05]; [06, fragments][R06]. |
+| 12 | Preview through `#preview`. [World README L13][WR07]; [Earlier post, Opportunity][L]. | README description is truncated. The earlier post supplies intent: preview without creating another user, with user-based authorization. No complete preview/admission profile is bound in the YAML. | Historical local observer behavior; no independent preview acceptance. | [05, sessions][R05]; [06, fragments][R06]; [09, errata][R09]. |
+| 13 | Save a world's URL. [World README L14][WR07]; [Earlier post, Unified Addressing][L]. | URL bookmarking is a client action; it need not have a new server endpoint. Preservation of a location or temporal state is the stronger question in entry 50. | Source only for persistent interoperability. | [05, persistence][R05]; [06, addressing][R06]. |
+| 14 | Share a world's URL. [World README L15][WR07]; [Earlier post, Unified Addressing][L]. | Ordinary URI sharing is real web behavior. The WoW files do not settle which world/view/user context survives sharing or how recipient permissions differ. | Source only for cross-client context transfer. | [05, persistence][R05]; [06, addressing][R06]. |
+| 15 | `GET /`, deliver the web application. [World API L17–29][W17]. | Explicit `text/html` response and operation identifier. Device selection and profile negotiation are not thereby guaranteed. | Historical local application delivery. | [05, current surface][R05]. |
+| 16 | `GET /wow/world`, return world status. [World API L32–44][W32]. | [World schema][W268] groups content, pose, presence, technology and user/view/portal counts. Typed optional fields are real constraints; they do not specify events or complete operational state. | Retained September 7 schema probe; historical local snapshots. | [01, frames][R01]; [05, state][R05]; [09, constraints][R09]. |
+| 17 | `GET /wow/user/{userId}`. [World API L47–66][W47]. | Integer path parameter; [User][W351] has numeric `id`, name, avatar link and pose. This retrieves a record; it is not an identity-assurance or manifest-binding protocol. | Retained September 7 schema probe; historical local user records. | [03, identity][R03]. |
+| 18 | `DELETE /wow/user/{userId}`. [World API L67–85][W67]. | User deletion and response outcomes are defined. Session authority, departure retries and global exclusivity are not. | Historical local presence; the retained isolated-controller probe does not test source-server exit-intent removal. | [03, user record][R03]; [05, lifecycle][R05]. |
+| 19 | `GET /wow/view/{viewId}` and exposed camera pose. [World API L88–107][W88]; [Home, The Spatial Worlds][H]. | Integer path parameter and [View pose][W382] are defined. No view-creation endpoint or application-level jump semantics is specified. | Retained September 7 schema probe; no independent viewpoint transfer. | [05, state][R05]; [06, view references][R06]. |
+| 20 | `GET /wow/portal/{portalId}`. [World API L110–129][W110]. | Explicit portal resource read. The [schema][W409] does not define destination semantics; reading a portal is not crossing it. | Retained September 7 schema probe; historical local extension. | [02, destination][R02]. |
+| 21 | `GET /wow/spatial/{spatialID}`. [World API L133–153][W133]. | Explicit spatial resource read and [rootNodeID/pose][W438]. Root enumeration, cycle handling and external-reference behavior need agreement. | Retained September 7 schema probe; historical local graph. | [08, graph][R08]. |
+| 22 | `POST /wow/spatial/{spatialID}/node/{nodeId}`. [World API L156–188][W156]. | An array of nodes can be supplied under an existing parent. `spatialID` is missing from the declared parameters; insertion/error semantics need tightening. | Historical local adapter evidence; no canonical interoperability run. | [08, graph changes][R08]; [09, errata][R09]. |
+| 23 | `GET /wow/spatial/{spatialID}/node/{nodeId}`. [World API L189–207][W189]. | Direct node addressing already exists. The operation describes a Node tree, and `children` embeds Nodes when supplied. Because `children` is optional, the schema does not require every response to include a complete subtree. Indexed storage is compatible with this wire form; depth and omission semantics remain to define. | Source inspection; historical local graph. | [08, representations][R08]. |
+| 24 | `PUT /wow/spatial/{spatialID}/node/{nodeId}`. [World API L208–241][W208]. | A Node request body is required; 400/404/422 outcomes are described. Its optional `children` field does not establish whole-subtree replacement or the meaning of omission. The undeclared `spatialID` parameter and update/conflict semantics need resolution. | Historical local graph; no conflict/recovery acceptance. | [08, updates][R08]; [09, errata][R09]. |
+| 25 | `DELETE /wow/spatial/{spatialID}/node/{nodeId}`. [World API L242–260][W242]. | Deletion outcomes are specified. Declared `nodeid` mismatches `{nodeId}`, and `spatialID` is undeclared. Descendant/reference cleanup semantics need a profile. | Source inspection; no cross-server deletion test. | [08, graph][R08]; [09, errata][R09]. |
+| 26 | Asset `HEAD /`, access and cache validation. [Asset API L19–34][A19]. | 200 authorizes resource access; other responses are unauthorized and redirects are not followed. ETag indicates cached revision. Credential acquisition and trust policy are not defined by ETag. | Source inspection; no asset authorization acceptance. | [04, trust distinctions][R04]; [07, delivery][R07]. |
+| 27 | Asset `GET /`, negotiated representation. [Asset API L35–161][A35]. | 21 response media-type entries, ETag and filename fallback exist. No mandatory common representation or complete negotiation/failure profile follows from the list alone. | Historical local loading; no 21-format acceptance. | [07, asset profile][R07]. |
+| 28 | `GET /wow/asset`, asset metadata. [Asset API L162–179][A162]. | [Asset][A180] contains content label, age restriction, licence, cost, version and pose. These declarations are not proof of rights, age suitability or trusted provenance. | Source inspection; no policy assurance test. | [04, declarations][R04]; [07, metadata][R07]. |
+| 29 | Manifest `HEAD /`, access and cache validation. [Manifest API L16–31][U16]. | Explicit 200/403/404 access semantics, no redirect following for HEAD, and ETag revision checks. This is real authorization binding for a manifest resource, distinct from holder proof or world admission. | Source inspection; no admission acceptance. | [03, assurance boundaries][R03]; [04, trust][R04]. |
+| 30 | Manifest `GET /`. [Manifest API L32–60][U32]. | A JSON manifest response and 302/403/404 outcomes are described; three content properties are optional. No wallet consent/presentation protocol is specified by this operation. | Retained September 7 signing probe concerns a separate local manifest profile. | [03, portable state][R03]. |
+| 33 | Dynamic hierarchical composition with asset links. [Home, The Spatial Worlds][H]; [Paper p22][P22]. | [Spatial/Node][W438] and [node operations][W156] provide a real graph surface. Optional `children` embeds Nodes; `parent` is an integer; transforms are numeric arrays without a fixed length. Alternate references need explicit cycle, deletion and omission rules; storage lookup complexity is not dictated by serialization. | Historical local graph; retained September 7 type checks. | [01, transforms][R01]; [08, graph][R08]. |
+| 36 | Billions of addressable states. [Earlier post, Rich Spatial Experiences][L]. | [Integer route parameters][W133] and identifiers provide addresses, not a demonstrated capacity bound. No network-scale load target or benchmark is specified. | No network-scale acceptance. | [08, graph][R08]; [10, scope][R10]. |
+| 37 | Consistent units, navigation and physics. [Earlier post, Initial Requirements][L]; [Paper pp7–8][P07]. | [Pose fields][W286], [presence strings][W307] and [localTransform][W471] exist. The paper explicitly requests coordinate origin and units. The API lacks a complete local frame/units/matrix binding; renderer normalization is a separate implementation choice. | Retained September 7 precision counterexample; local rendering evidence is historical. | [01, frame agreement][R01]; [07, renderer choices][R07]. |
+| 38 | Shared multi-user, multi-device experiences. [Earlier post, Collaborative Environment][L]; [Paper p8][P08]. | [User endpoints][W47] and [counts][W325] exist. No transport, snapshot/event ordering, resume or global authority protocol was located. | Historical local presence; retained controller-isolation evidence and source-server behavior have different boundaries. | [05, synchronization][R05]. |
+| 39 | Dynamic desktop, mobile and immersive configurations. [Earlier post, Collaborative Environment][L]; [Paper pp17–18][P17]. | [Runtime and immersive-profile metadata][W316] are explicit. A device-adaptation algorithm or compatibility matrix is not bound. | No device-matrix acceptance. | [07, delivery choices][R07]; [10, scope][R10]. |
+| 40 | World-independent identification and data authentication. [Earlier post, Collaborative Environment][L]; [Asset README, Data Security][AR]. | The Asset README names HTTP authentication plus modern single sign-on; [asset HEAD][A19] and [manifest HEAD][U16] bind access outcomes. The identity provider, credential exchange and holder/admission rules are not specified here. | Retained September 7 signing probe cannot establish identity or age assurance. | [03, identity][R03]; [04, access and trust][R04]. |
+| 41 | Navigate to predefined viewpoints. [Earlier post, Initial Requirements][L]; [Paper p28][P28]. | [View GET/pose][W88] exists. The paper gives the dotted `#join=view.5845` example; the README uses `aspect.id`. A shared resolver must define supported kinds, view-to-pose mapping and unknown-target behavior. | Historical local navigation; no independent frame-transfer acceptance. | [02, arrival pose][R02]; [06, references][R06]. |
+| 42 | Create and share viewpoints. [Earlier post, Initial Requirements and Extending Web Patterns][L]. | [View path][W88] has GET only. A client may share a URI without a new endpoint; creation, stable identity and persistence of a new view need a binding. | No inter-implementation create/share test. | [05, persistence][R05]; [06, addressing][R06]. |
+| 43 | Security against interception and other threats. [Earlier post, Initial Requirements][L]; [Paper pp7,10,15][P10]. | Existing web authentication/encryption is explicitly part of the architecture. Asset/manifest test servers use HTTPS; World examples use HTTP. No security-scheme declaration or complete deployment policy is provided. Unsigned JSON alone does not prove interception. | Local signing/fabric evidence, bounded by key/trust configuration; no production security acceptance. | [04, threat and trust boundaries][R04]. |
+| 44 | User-controlled join/rejoin management. [Earlier post, Opportunity][L]. | [User resource operations][W47] and [join examples][WR07] exist. No account creation, reconnect, expiry, deduplication or authority-transfer binding was located. | Historical local continuity. Accepted source exit-intent removes local presence; target arrival and registration remain separate requests. No atomic transfer between independent servers is established. | [02, crossing][R02]; [05, lifecycle][R05]. |
+
+### Preserved aliases
+
+These identifiers remain usable in earlier references. They add source corroboration, not another independent outcome, and are excluded from the 76 active entries.
+
+| Original ID | Original subject and source | Active comparison |
+|---|---|---|
+| 31 | Portal links to external worlds; [Home, The Spatial Worlds][H]. | **5**. Same destination declaration and API gap. |
+| 32 | Exposed viewing pose; [Home, The Spatial Worlds][H]. | **19**. Same readable View capability; navigation remains separate in 41. |
+| 34 | Registered model types; [Home, The Spatial Asset][H]. | **6**, with the actual media-type operation in 27. |
+| 35 | JSON-LD, identifiers and credentials in the user manifest; [Announcement, Technical Stack][A]. | **7**, with the additional disclosure/format distinctions in 53–54. |
+
+## Additional declarations from the complete sources
+
+These 36 entries extend the preserved inventory. Architectural intent is evidence of what the authors propose; it is not an implementation result.
+
+| ID | Published position and locator | Current binding and remaining question | Local evidence | Report treatment |
+|---|---|---|---|---|
+| 45 | Use cases, technology inventory and gap analysis guide an evolving working-group roadmap. [Paper p6, Process and Deliverables][P06]; [Earlier post, Outlook and Roadmap][L]. | A published process exists. The API is one output of it; project governance and standards adoption do not belong in a resource schema. | Source only; no audit of process execution. | [10, roles and decisions][R10]. |
+| 46 | Support varied uses: education and field trips, industrial collaboration, games, social interaction and digital twins. [Paper pp7–9, Use Case Summaries][P07]; [Summary, Use Cases][S]; [Announcement, Scalable Use Cases][A]. | The shared world/asset/manifest model can serve these uses. Domain behavior, including measurements, spatial audio, transactions and accessibility, still needs applicable profiles and tests. | No acceptance across these application domains. | [07, content scope][R07]; [10, boundaries][R10]. |
+| 47 | Define functional content profiles and levels of 3D functionality. [Paper pp6–7, Working Group Roadmap][P06]. | [Asset negotiation][A35] and [runtime metadata][W316] describe available representations and technology. They do not define a shared feature-level contract or preserve every behavior of a rich scene. | Source only for a common profile. | [07, candidate asset profile][R07]; [09, conformance][R09]. |
+| 48 | Extend 3D user agents for accessible experiences, with familiar controls adapted to the device. [Paper pp7–8, Roadmap and Consistency of Experience][P07]. | [Application delivery][W17] leaves the browser/application in charge of interaction. [Presence strings][W307] name navigation and gravity without binding control, collision, audio or accessibility semantics. | No device/control/accessibility test matrix. | [07, renderer boundary][R07]; [10, adjacent standards][R10]. |
+| 49 | Establish initial connectivity with content metadata, coordinate origin and units, then a scene-function profile. [Paper p7, Hello Metaverse][P07]. | [World.content and geoPose][W268] carry some metadata; required handshake content, local coordinate meaning and a functional payload profile are not settled. GeoPose Basic YPR has fixed WGS-84/ENU and ellipsoidal-height semantics. Optional georeferencing and explicit mapping into local coordinates must remain distinct. | Retained September 7 schema probe; no complete handshake test. | [01, coordinate contract][R01]; [09, useful responses][R09]. |
+| 50 | Bookmarks preserve place, viewpoint, context and possibly time; they can be shared, embedded in media and linked to physical overlays. [Paper p7, Metaverse Bookmarks][P07]; [Earlier post, Extending Web Patterns][L]. | [View reads][W88] and [fragment examples][WR07] give a starting point. Stable identities, temporal-state meaning, changed-world behavior and permissions need agreement. | Historical local fragment behavior; no enduring cross-client bookmark acceptance. | [05, persistence][R05]; [06, references][R06]. |
+| 51 | Carried personal content should retain geometry, appearance, lights, animations, sensors, behavior and familiar interaction. [Paper pp7–8, Portable Personal Content][P07]. | [Avatar and asset links][W351] identify content; a list of [asset media types][A35] does not guarantee behavior transfer. The paper's vehicle and wearable examples require more than loading geometry. | Historical local avatar/equipment evidence; no general behavior-preserving asset transfer. | [03, portable content][R03]; [07, asset profile][R07]. |
+| 52 | Users control data access per item, by default privately, with consent and limits on the lifetime of shared data. [Paper pp9–11,15][P09]; [Announcement, Privacy and User Ownership][A]; [Home, User Manifest][H]. | [Manifest HEAD][U16] defines resource access outcomes. It does not encode per-claim disclosure, consent records, retention obligations or revocation propagation. These concerns are explicit architecture. | No disclosure/retention enforcement acceptance. | [03, user control][R03]; [04, policy boundaries][R04]. |
+| 53 | A DID-enabled wallet holds keys, private credentials and the manifest or its links; it requests consent and makes selective or derived presentations. [Paper pp11,15][P15]. | [Manifest GET][U32] retrieves data. It is not a wallet presentation protocol, proof of live holder control or a decision to admit a user. | Retained September 7 local signature copy/tamper probe; copied signed data still verifies. | [03, assurance and admission][R03]; [04, trust][R04]. |
+| 54 | Standardize a JSON-LD manifest's format and names across wallets, issuers, verifiers and worlds; include preferences, consent, payment handles, credentials, public/private data and asset links. [Paper pp9–10,15][P15]. | [UserManifest][U47] provides optional `name`, `age` and `avatarAssetURI` content fields. A common linked-data context and the fuller vocabulary are not bound in these files. | Local signed-manifest profile is separate; no common-vocabulary acceptance. | [03, manifest profile][R03]; [10, portable inventory/preferences][R10]. |
+| 55 | Mix URI families and resolve data in stages: identification, secured transmission, translation and traversal. [Paper pp16–17, Figures 3–4][P16]; [Home, Spatial Asset][H]. | [Asset links][W471] and [ETag/negotiation][A19] cover parts of the chain. DID method selection, resolver trust, supported URI schemes, relative bases, caching and failure rules need a shared profile. | Historical local discovery; no harmonized multi-resolver acceptance. | [06, resolution][R06]; [07, asset links][R07]. |
+| 56 | Asset instances can have multiple URI links with fallback; linked content can deliver spatial sound. [Paper p10, Linked Spatial Assets][P10]. | [Node][W471] has one `spatialAssetURI` and one `appearanceURI`; no ordered alternatives or fallback behavior is specified there. A payload format may carry its own links or audio, but the generic API does not promise those features for all formats. | No common fallback/audio test. | [07, capability and fallback][R07]. |
+| 57 | Large or customized data can stay in authenticated distributed services, using compression, streaming, signatures and encryption where appropriate. [Paper pp7,10, Efficient Delivery][P10]; [Asset README, Data Security][AR]. | [Asset HEAD/GET][A19] binds access checks, negotiation and revision hints. It does not bind a complete identity-provider, encrypted-content, progressive-delivery or trust policy. Existing web protection is part of the architecture. | Local signing evidence only; no general secure-streaming acceptance. | [04, provenance and permission][R04]; [07, delivery][R07]. |
+| 58 | Include part of one world’s composition within another through a data inline. [Paper p10, X3D Anchor/Inline lineage][P10]; [Paper pp14,21, Figures 2 and 9][P21]; [World README, Optional Feature][WR17]. | The README explicitly proposes exposing scene parts; [Node][W471] links assets and embeds children. A live cross-world node's encoding, revision, authorization and failure behavior remain unbound. | Historical local transclusion; its signed-fabric form is one candidate. | [07, transclusion][R07]; [08, graph references][R08]. |
+| 59 | A graph can link a live internal node instance. [Paper p22, Dynamic Spatial Composition][P22]. | [Node GET][W189] already addresses a node, and `parent` is an integer. The `children` array embeds Nodes rather than declaring an alternate internal-reference representation. | Historical local reference graph; no alternate-format interoperability test. | [08, representations][R08]. |
+| 60 | A graph can link a live node in another world. [Paper p22, Dynamic Spatial Composition][P22]. | A direct node endpoint exists. The canonical Node schema does not define a distinct external-node reference, its frame, revision, authorization or failure semantics. A proposed reference form must handle cycles and unavailable targets. This is a missing binding for a published idea. | Historical local external composition; no independent shared-reference acceptance. | [01, frame mapping][R01]; [08, external references][R08]. |
+| 61 | Model data uses orthogonal spatial/temporal dimensions, transformed object instances, local or external elements, and structure-preserving conversion. [Paper pp19–20, Scope and Foundation][P19]; [Asset README, Model Type Definition][AR]. | This is an explicit architectural expectation derived from RFC 2077. [Media-type declarations][A35] alone do not check conversion fidelity or every format's linking behavior. The paper's registration counts and format taxonomy describe its snapshot, not this report's current format audit. | No all-format conversion or registration audit. | [01, transforms][R01]; [07, representation limits][R07]. |
+| 62 | Keep rendering and spatial work efficient through client/server distribution, adaptable apps and reduced data-size sensitivity; an interactive app runs at least one real-time session. [Paper pp12,14,23–24, Figures 1,11–13][P23]; [Earlier post, Rich Spatial Experiences and Opportunity][L]. | [Application delivery][W17] permits different implementations. The architecture names sessions but does not bind their ownership, recovery or replay. No mandatory compositor or throughput guarantee follows. Figure 13 is a conceptual classification, not a performance/security test. | Historical local rendering; retained September 7 numerical counterexample rejects a universal precision claim. | [01, precision methods][R01]; [07, renderer choices][R07]. |
+| 63 | Compute a bounding volume. [Paper p25, Spatial Computing Operator][P25]; [Announcement, Human-AI Collaboration][A]. | No corresponding operation in the pinned three API files. Optional asset volume metadata in the [Asset README][AR] does not define a computation request. | No operator acceptance. | [10, computing scope][R10]. |
+| 64 | Select objects or content by a volume. [Paper p25, Figure 14][P25]. | No volume-selection operation or result semantics in the pinned API files. The figure illustrates the intended operation. | Source only. | [10, computing scope][R10]. |
+| 65 | Compute a ray intersection. [Paper p25][P25]. | No corresponding operation, frame convention, filtering or hit-result contract in the pinned API files. | Source only. | [01, frames][R01]; [10, computing scope][R10]. |
+| 66 | Compute minimum distance. [Paper pp9,25][P25]. | No corresponding operation, units, geometric tolerance or result contract in the pinned API files. The industrial AI example is an intended workflow. | Source only. | [01, units][R01]; [10, computing scope][R10]. |
+| 67 | Compute clashes or collisions. [Paper p25][P25]; [Announcement, Human-AI Collaboration][A]. | No corresponding operation or collision-policy contract in the pinned API files. `presence.gravity` is a string, not this operator. | Source only. | [10, computing scope][R10]. |
+| 68 | Implementations may provide selected features; future levels should classify them. Both open-source and commercial implementations are encouraged. [Paper p26, Principles and Parsimony][P26]. | Selective implementation is explicit architecture. The pinned API files do not bind numbered capability levels or their tests. A future profile should define required behavior without assuming every feature is universal. | No acceptance of published implementation levels. | [09, behavioral profiles][R09]; [10, scope][R10]. |
+| 69 | Advocate standards through W3C liaisons and community groups: 3D media fragments, User Manifest and user-agent improvements. [Paper p30, SDO Adoption Plan][P30]. | This is a published adoption strategy, not a missing REST operation. It does not establish adoption or settle which organization owns each final specification. | Source only. | [06, fragments][R06]; [10, responsibility][R10]. |
+| 70 | Develop an X3D WoW Profile using grouping, metadata, networking, navigation and geospatial nodes, first as recommended practice and then a planned X3D 4.1 standard. [Paper p30, node table][P30]. | The paper identifies concrete existing node families. The WoW API does not incorporate a versioned normative profile or conformance corpus for them. This entry reports the paper's plan, not present X3D release status. | No X3D WoW Profile acceptance. | [07, content profile][R07]; [09, conformance][R09]; [10, adjacent standards][R10]. |
+| 71 | Extend X3D networking support for URIs and experience fragments compatible with WoW. [Paper p31][P31]. | The plan is written; the [World README][WR07] fragment examples do not define the cross-standard mapping or all failure behavior. | No cross-standard fragment test. | [06, fragment profile][R06]; [09, versioning][R09]. |
+| 72 | Deliver a matching app to a returning or new user without an extra install; entry examples combine a world URL, `userManifestURI` query and `#join=view...` fragment. [Paper pp26,28][P28]; [Paper Figure 9][P21]. | [GET /][W17] delivers a default app. The paper also shows AppManifest links, a `userManifestURI` query and the dotted `#join=view.5845` intention. Stray punctuation makes the printed example unsuitable as a literal test vector. Define the entry URL, API base and reference-resolution rules separately; a query is not inherently invalid. | Historical local entry parser; retained September 7 URL probe disproves the blanket query ban. | [05, entry][R05]; [06, resolution][R06]. |
+| 73 | Create a composed node with reused externally linked assets. [Paper p29, Spatial Composition Manipulator][P29]. | The [World README][WR17], paper example and [simpleWorlds API declaration][SWAPI] use `/wow/scene/node…`; only the pinned canonical [POST][W156] uses `/wow/spatial/{spatialID}/node/{nodeId}`. The paper also uses `name`/`assetURI` and an illustrative single object with incomplete punctuation; canonical POST takes a Node array with `label`/`spatialAssetURI`. Reconcile paths, graph identity, fields and body shape explicitly. | Source comparison; example was not executed. | [08, operations][R08]; [09, errata][R09]. |
+| 74 | Human personas and application roles, plus an AI path, share a persistent-world API above composition, spatial computing, data provisioning and georeferences. [Paper p27, Figure 15][P27]; [Repository architecture diagrams][ARCH]. | The diagram explicitly contains roles, protected access and georeference services. [User][W351] is a small resource record; no common role mapping, admission profile or complete operator layer is bound. | No common role-policy acceptance. | [03, identity][R03]; [04, permissions][R04]; [10, architecture][R10]. |
+| 75 | Optional asset metadata includes generator, copyright, revision, formats, 3D volume and GeoPose. [Asset README, Additional Asset Aspects][AR]. | [Asset][A180] has content/pose fields and [responses][A19] have ETag. Generator, copyright, volume and a structured formats list are not mapped to common schema fields. Optional is the publisher's stated scope. | Source only. | [01, optional extent][R01]; [07, metadata][R07]. |
+| 76 | Model fragments should address spatial, temporal or structural sub-data. [Asset README, Data Fragment Addressing][AR]. | The README gives spatial-box/time and named-node examples as an open opportunity. It supplies no full model-fragment grammar or media-type processing rules. This does not establish worldwide absence of a relevant standard. | No model-fragment interoperability test. | [06, references][R06]; [07, representation][R07]. |
+| 77 | Named implementations use different engines, asset formats and feature sets. [Paper p26, implementation table][P26]; [Home, Implementations][H]. | The home page lists six world implementations and two asset services, with publisher-supplied level/status cells. The paper has a different three-column snapshot. Listings, licence labels and blank cells do not certify functionality or current availability. | No comparative implementation assessment. | [10, implementation context][R10]; [METHOD][M]. |
+| 78 | Continue with test beds, demos, content profiles/components, header/media-type declarations and web user agents. [Paper p31, Next Steps][P31]. | These are explicit development directions. API negotiation supplies part of the delivery surface; a shared test corpus and versioned capability declarations still need definition. | Local tests are evidence for one implementation, not completion of this roadmap. | [07, profiles][R07]; [09, conformance][R09]. |
+| 79 | Organize WoW under the Spatial Computing Working Group and pursue initiative status. [Home, Foundation][H]; [Announcement, Next Steps][A]. | The home page states subgroup placement. The announcement states an initiative ambition and a SIGGRAPH target. These are dated organizational statements, not evidence that a launch or governance transition occurred. | Source only; no independent organizational-status confirmation. | [10, governance questions][R10]. |
+| 80 | Coordinate with standards bodies and neighboring initiatives, including OMBI, OpenARCloud and OMA3. [Earlier post, Outlook and Roadmap][L]; [Announcement, Next Steps][A]; [Paper pp30–31][P30]. | The publications describe liaison and alignment intentions. API fields cannot establish completed agreements, interoperable integrations or responsibility assignments. | No joint-conformance acceptance. | [10, neighboring responsibilities][R10]. |
+
+## Source-by-source coverage account
+
+The complete bodies of these named sources were read, including the full paper's contents, all pages, requirement lists, examples, tables and figures. The table below maps every source region to entries or states why it is context. This is an inspectable account of this named set, not a claim about every WoW publication or every external standard it cites.
+
+| Source region | Comparison entries or disposition |
+|---|---|
+| Paper p1, abstract and contents | 2, 5–8, 33, 58; contents provide navigation, not additional requirements. |
+| Paper pp2–4, vision, standards table, principles and open/closed comparison | 1–4, 8, 62. The standards table is the authors' foundation map; its linked standards are not each counted as a WoW requirement. |
+| Paper p5, strategic initiatives and industrial associations | Context for 46 and 80. External funding, program dates, digital-twin standards and data-space histories are attributed background, not fresh findings of this report. |
+| Paper pp6–7, process and five roadmap areas | 45, 47, 48, 57, 58, 78; links, profiles, security, user agents and delivery are all covered. |
+| Paper pp7–9, all seven use-case summaries | 1, 4, 9, 37–39, 46, 48–54, 66. Covers initial connectivity, bookmarks, portable content, field trips, consistency, Universal Manifest and AI collaboration. |
+| Paper pp10–11, complete requirements lists | 5–9, 40, 43, 49, 52–57, 61. Includes asset fallback/audio, web security, efficient delivery, per-item permission, user transportation and human/AI symmetry. |
+| Paper pp12–13, gap analysis and Figure 1 | 2, 7, 8, 54, 62. The missing standardized manifest and simpler shared architecture are stated goals, not a claim that prior standards provide no useful behavior. |
+| Paper pp14–15, core world/manifest/asset structure and Figure 2 | 5–8, 15–21, 33, 51–58, 62. The user-movement and data-inclusion arrows denote distinct relationships. |
+| Paper pp16–18, connectivity, Figures 3–4, users/devices/applications and simplicity | 1–4, 8, 39, 48, 55, 62, 72, 74. The resolver stages and application roles are architectural provisions. |
+| Paper pp19–20, model scope, format table, Figures 5–7 | 6, 27, 55, 57, 61. Format registration totals, historical dates and format-link taxonomy are publisher context; no current all-format audit is claimed. |
+| Paper p21, linked experiences and Figures 8–9 | 5, 7, 15–21, 33, 58, 60, 72. Covers web-app, user, view, portal, spatial and node relationships, AppManifest, GeoPose, and external world/asset links. Diagram cardinalities are not imposed as new YAML constraints. |
+| Paper p22, graph prose and Figure 10 | 33, 55, 59–60. Shared asset instances, local transforms and both kinds of live node reference are covered. |
+| Paper pp23–24, computing/rendering and Figures 11–13 | 38, 44, 62. The user/device/session model and client/server performance classification are architecture, not measured guarantees. |
+| Paper p25, five computing operators, Figure 14 and human/AI symmetry | 9, 63–67. Each named operator has a separate entry. |
+| Paper pp26–27, parsimony, implementation table and Figure 15 | 2, 8, 9, 47, 68, 72, 74, 77. Selected features, future levels, app delivery, role structure and georeferences are retained. |
+| Paper pp28–29, experience delivery and node-manipulation examples | 10, 41, 55, 72–73. Query/fragment intent and discrepancies in the illustrative mutation are explicit. |
+| Paper pp30–31, adoption plan, full X3D node table and next steps | 69–71, 78, 80. The node table covers Transform/Group/StaticGroup, Metadata nodes, Anchor/Inline, viewpoints/navigation, and GeoOrigin/GeoLocation/GeoViewpoint. |
+| Paper pp32–33, references | Bibliography accounted for as supporting literature; those linked papers are outside this named comparison unless separately cited elsewhere in the report. |
+| Executive summary: Overview, Vision, Core Concepts | 1–9, 33, 51–55, 58. Repeated declarations corroborate existing entries. |
+| Executive summary: Architecture, Benefits, Use Cases, Conclusion | 2, 8, 33, 46, 62, 72. Claims of scalability, flexibility and efficiency are intended benefits, not benchmarks. |
+| Earlier post: Introduction, Core Principles and four requirement groups | 1–6, 10, 13–14, 33, 36, 38–40, 50, 55, 62. Includes data-size/fidelity ambition and app-controlled delivery. |
+| Earlier post: Initial Requirements, Opportunity, Extending Web Patterns | 10–14, 19, 33, 37, 40–44, 50, 58, 60, 62, 72. Includes preview authorization without another user, existing-user/view addressing, and optional scene-state exposure. |
+| Earlier post: Outlook, Roadmap and references | 45, 69–71, 78, 80. Invitations and references are context; they add no independent acceptance result. |
+| Announcement: Vision, Open Web Values, Technical Stack | 1–8, 10, 12, 33, 50, 54, 58, 72. The three service roles are compared with their pinned bindings. |
+| Announcement: Privacy, Human-AI Collaboration, Use Cases, Next Steps | 9, 46, 52–54, 63, 67, 77, 79–80. Preview dates, partnerships and initiative targets remain dated publisher statements. |
+| Home: Foundation, posts and paper links | 45, 79–80; dates identify the linked works, not all home-page content. |
+| Home: all core principles, world/manifest/asset text and architecture diagrams | 2, 5–8, 15–21, 33, 52–55, 58–60, 72, 74. World state, user state, media assets and service roles remain distinct. |
+| Home: both implementation tables and call for action | 77; participation invitation is context. |
+| [WoWAPI repository README][ROOTR]: links and both architecture diagrams | 15–30, 33, 55, 58, 72, 74. The diagrams support architectural relationships, not complete wire contracts. |
+| [Specification README][SPECR]: entire file | A heading only; no independent behavioral declaration. |
+| World README: every Core Requirement and Optional Feature | 10–14, 16–17, 33, 58–60, 72–73. Optional exposure and the `/scene/` wording are retained rather than treated as absent ideas. |
+| World API: all operations and all six component schemas | 15–25, 33, 37, 39, 49, 59–60, 73–74. Field-level details and errata are further indexed in [Appendix A][RA]. |
+| Asset README: security/change/format requirements, model definition/registration, optional metadata and fragment examples | 6, 26–28, 40, 55–57, 61, 75–76. Its registration table is distinct from the API's 21 response media-type entries. |
+| Asset API: both paths, all three operations, metadata schema, headers and media types | 26–28, 40, 43, 57, 61, 75. |
+| [Manifest README][UR]: entire file | Source and preview links only; no additional manifest semantics. |
+| Manifest API: both operations, schema and headers | 7, 29–30, 52–54. |
+| Bounded contextual comparison: [simpleWorlds README API table][SWR] and [published API path][SWAPI] at `13d2cbe` | 73. Used only to compare declared paths; not a review of handlers, validation, event delivery, persistence or conformance. |
+
+No substantive declaration in these reviewed source regions was intentionally excluded. Different granularity would change the entry count; the locators and grouped subclaims expose that choice. A newly located source or omitted distinct behavior should receive an explicit addition or alias rather than silently changing an existing identifier.
+
+## Meeting context, kept separate from public-source evidence
+
+G1–G5 retain their original identifiers for five discussion notes from the August 24, 2026 working-group meeting. They are paraphrases carried from the meeting record, not public specifications or proof that a proposed structure is operating. The transcript is not publicly cited here. No conclusion about absence of governance documents follows from searches of API fields.
+
+| ID | Recorded discussion and locator | Current comparison and question | Report treatment |
+|---|---|---|---|
+| G1 | Initiative hub within Forum infrastructure linking external projects; meeting record lines 109 and 605. | Public organizational context appears in entry 79. Confirm the operative charter, mandate and project relationship from a governance source. | [10, governance][R10]. |
+| G2 | Business council connecting developer communities and standards bodies; lines 141, 613 and 655. | A council is a governance proposal, not an omitted API operation. The record does not establish its current membership or authority. | [10, governance][R10]. |
+| G3 | External maintainer council and an unresolved relationship to the hub; lines 145–147. | Distinguish maintainers of code from the body setting standards. Request the current role/decision document; an API keyword count cannot answer this. | [10, governance][R10]. |
+| G4 | Open-source licensing and contributor agreement were discussed; line 157. | Repository licence terms, contribution agreements and `content.license` fields are separate matters. The meeting statement is not evidence of an executed contributor agreement for each project. | [10, governance and licensing][R10]. |
+| G5 | A contact connecting developer communities and standards organizations; line 213. | The public paper already describes liaison/adoption plans in entries 69–71 and 80. A named accountable contact and operating process require a current governance reference. | [10, responsibility][R10]. |
+
+## What this changes for the working group
+
+The useful next decisions concern common bindings for ideas already present in the architecture. The report's [five bounded asks][RR] retain an optional portal destination, a behavioral conformance profile, a decision on `scene`/`spatial`, a compatible `lan`/`lon` correction tied to GeoPose, and an optional signed-subtree evaluation track. None requires adopting a particular renderer or treating signatures as identity assurance.
+
+The declaration register provides traceability for those decisions. It does not prove that every architecture goal belongs in the base API, that every listed implementation supports it, or that the proposals have passed independent interoperability tests.
+
+[A]: https://metaverse-standards.org/news/blog/announcing-the-web-of-worlds-whitepaper-a-concrete-path-to-the-open-metaverse/
+[A162]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialAsset/API.yaml#L162
+[A180]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialAsset/API.yaml#L180
+[A19]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialAsset/API.yaml#L19
+[A35]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialAsset/API.yaml#L35
+[API]: https://github.com/WebOfWorlds/WoWAPI/tree/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de
+[AR]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialAsset/README.md
+[ARCH]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/figures/architecture.svg
+[H]: https://webofworlds.github.io/
+[L]: https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/
+[M]: METHOD-AND-SOURCES.md
+[P]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf
+[P02]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=2
+[P04]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=4
+[P06]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=6
+[P07]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=7
+[P08]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=8
+[P09]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=9
+[P10]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=10
+[P15]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=15
+[P16]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=16
+[P17]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=17
+[P19]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=19
+[P21]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=21
+[P22]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=22
+[P23]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=23
+[P25]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=25
+[P26]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=26
+[P27]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=27
+[P28]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=28
+[P29]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=29
+[P30]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=30
+[P31]: https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=31
+[PR]: https://github.com/WebOfWorlds/initial_MSF_Whitepaper/tree/988f369b0af206de0a7b53e7903dd55e08be80a0
+[R01]: 01-coordinate-precision-units-and-extents.md
+[R02]: 02-portal-destination-and-traversal.md
+[R03]: 03-portable-user-state-and-identity.md
+[R04]: 04-provenance-and-signed-subtrees.md
+[R05]: 05-presence-live-sync-and-persistence.md
+[R06]: 06-discovery-and-addressing.md
+[R07]: 07-assets-and-the-render-seam.md
+[R08]: 08-composition-graph-schema-fixes.md
+[R09]: 09-conformance-vocabulary-and-errata.md
+[R10]: 10-role-and-blind-spots.md
+[RA]: A-completion-map.md
+[ROOTR]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/README.md
+[RR]: README.md#five-decisions-for-the-working-group
+[S]: https://webofworlds.github.io/initial_MSF_Whitepaper/
+[SPECR]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/README.md
+[SW]: https://github.com/WebOfWorlds/simpleWorlds
+[SWAPI]: https://github.com/WebOfWorlds/simpleWorlds/blob/13d2cbea991e17df0b14857f11f693712e6171cb/packages/wow-spec/src/schema.yaml#L124-L228
+[SWR]: https://github.com/WebOfWorlds/simpleWorlds/blob/13d2cbea991e17df0b14857f11f693712e6171cb/README.md#L77-L92
+[U16]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenUserManifest/API.yaml#L16
+[U32]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenUserManifest/API.yaml#L32
+[U47]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenUserManifest/API.yaml#L47
+[UR]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenUserManifest/README.md
+[W110]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L110
+[W133]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L133
+[W156]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L156
+[W17]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L17
+[W189]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L189
+[W208]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L208
+[W242]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L242
+[W268]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L268
+[W286]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L286
+[W307]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L307
+[W316]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L316
+[W32]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L32
+[W325]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L325
+[W351]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L351
+[W382]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L382
+[W409]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L409
+[W438]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L438
+[W47]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L47
+[W471]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L471
+[W67]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L67
+[W88]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/API.yaml#L88
+[WR07]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/README.md#L7-L15
+[WR17]: https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/README.md#L17-L31

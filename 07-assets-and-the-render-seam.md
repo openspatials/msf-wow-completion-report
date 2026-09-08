@@ -1,6 +1,6 @@
 # Assets and the Render Seam
 
-The Web of Worlds specification defines content negotiation across 21 registered model media types (OpenSpatialAsset) and gives every scene-graph node a `spatialAssetURI` field (OpenSpatialWorld), but it specifies neither what that URI resolves to, how the resolved content is rendered, nor what happens when the content is a signed spatial document rather than an inert 3D asset. A conformant server can serve any of the 21 types; a conformant client has no way to know which ones to expect, no vocabulary for how to present them, and no concept of a document that carries its own executable scene graph. Three additions close these gaps (all verified in code): a baseline required asset format, a typed transclusion contract for signed spatial documents, and an explicit scope statement for engine-internal surfaces the standard should not reach. A fourth item, a registered media type for signed spatial documents, is an open question for the working group and for IANA.
+OpenSpatialAsset 0.0.1 lists 21 model media types for content negotiation, while OpenSpatialWorld gives nodes a spatialAssetURI. The asset README also discusses HTTP authentication, modern single sign-on, ETag change detection, optional volume/GeoPose/format metadata and a Model Fragment URI opportunity. These provisions should be retained. The remaining proposals concern an agreed minimum asset profile, URI-reference resolution and an optional signed executable-subtree contract; they do not mandate one renderer or claim the architecture lacks external nodes.
 
 **Specification examined at commit d39a1a0 (WebOfWorlds/WoWAPI main, checked 2026-09-07).**
 
@@ -20,32 +20,32 @@ The field carries no `format` (such as `uri`), no `mediaType`, no `enum`, and no
 
 **OpenSpatialAsset content negotiation** lists 21 model media types on the root GET `/` endpoint (OpenSpatialAsset/API.yaml, lines 52-161, [blob link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L52-L161)). The types range from `model/3mf` through `model/x3d+xml`. No type is marked required. No rendering semantics are defined for any of them. Searched terms with zero hits in OpenSpatialAsset/API.yaml: `signed`, `signature`, `jws`, `verified`, `render`, `placement`.
 
-**The README** describes the URL entry points (`URL/wow/scene/`, `URL/wow/scene/node`) but offers no guidance on what a client does with the asset a node references (OpenSpatialWorld/README.md, [blob link](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md)).
+**The READMEs and whitepaper.** OpenSpatialWorld lists scene/resource entry paths. OpenSpatialAsset describes negotiation, access and metadata conventions, and the March 31, 2026 whitepaper describes internal/external node references on printed page 22. These are architectural and resource-level provisions; a signed executable-subtree profile still needs a specific binding for trust, frames, execution and limits.
 
-In short: the specification tells a client where to find an asset and offers 21 possible formats, but says nothing about which format to expect, how to render it, or what to do when the asset is not an inert mesh but a signed, executable spatial document.
+The asset GET response also provides a `Content-Disposition` filename-extension hint when `Content-Type` is absent ([API lines 39–48](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml#L39-L48)). Its `HEAD /` authorization and ETag checks are separate from payload signatures. The listed media types and negotiation mechanism are useful existing capabilities. A shared asset profile would specify which representation participants must support, how to report no common representation, and which content classes need a different profile.
 
 
 ## What fails without the fix
 
-**No baseline format, no interop.** Two conformant servers can each serve a format the other's clients cannot consume. Server A serves `model/vnd.usdz+zip`; Server B serves `model/gltf-binary`. A client built for one will show nothing when it visits the other. The 21-type content-negotiation list becomes a menu nobody can order from, because no minimum order is defined.
+**No guaranteed common representation.** Two participants with disjoint supported formats can fail negotiation even though each implements a listed format. This motivates a minimum representation for an agreed content/use-case profile, not a demand to convert every spatial document into GLB.
 
-**No transclusion contract, catastrophic defaults.** A node that transcludes an external spatial document through `spatialAssetURI` has no way to state the document's unit scale, up-axis, or rendering backend. Open Spatial Lab hit this directly: a Z-up fabric mounted into a Y-up host renders on its side; a fabric authored in astronomical units (1 AU per unit) mounted into a 1:1-metre room renders the solar system at Earth-to-Sun distance per metre. Both are valid readings of a bare string field with no metadata. The spec permits the address; it does not carry the contract the address needs.
+**No shared transclusion-frame binding.** A source and host need unit and basis mappings for composition. Open Spatial Lab's missing-field failures exposed those needs in its Z-up fabric/Y-up host. The existing open node schema permits metadata, but does not assign shared transclusion semantics or require the local backend-selection field.
 
-**No depth-buffer truth.** Two stacked WebGL canvases cannot share a depth buffer. A client that transcludes external spatial content must choose between depth-correct compositing (one shared scene graph, approximate shading) and measured-parity rendering (a stacked layer, no occlusion). The choice is forced by GPU architecture, not preference, and the specification has no field to record it. Without one, a client either guesses or ignores the problem; both produce incorrect visuals.
+**Independent canvases do not share depth.** Two stacked WebGL canvases do not automatically produce shared depth ordering. Open Spatial Lab offers an in-room Three.js path with common depth and approximate shading, and a Filament backdrop path without shared occlusion. Those are its two backends, not an exhaustive law of GPU architecture. Other engines can choose different compositing arrangements; an interoperability profile should state observable occlusion requirements where needed.
 
-**No recursion cap.** A spatial document that transcludes other spatial documents can create unbounded nesting chains. Without a per-transclusion recursion limit, a world that references itself (directly or through a chain) exhausts memory or enters an infinite render loop.
+**Resource limits need an execution profile.** Recursive or cyclic references can exhaust resources. A signed-subtree profile must define cycle handling and client-enforced limits, including depth, bytes, time and capabilities as appropriate. Publisher-supplied limits cannot raise the client's own bounds, and a signature does not make execution safe.
 
-**No scope boundary for engine internals.** The specification is silent on physics, audio spatialization, and input device mapping. Searched terms with zero hits in OpenSpatialWorld/API.yaml: `physics`, `audio`, `input`. (`gravity` appears once at OpenSpatialWorld/API.yaml line 314 as a string property under `World.presence`, alongside `avatar` and `navigation`; it is a world metadata field, not a physics simulation surface.) An implementer cannot tell whether these surfaces are out of scope by design or simply not written yet.
+**Engine behavior needs a profile boundary.** The pinned OpenSpatialWorld API does not bind physics, audio spatialization or input-device mapping. Searched terms with zero hits in that file: `physics`, `audio`, `input`. (`gravity` appears once at line 314 as a string property under `World.presence`, alongside `avatar` and `navigation`; it is metadata, not a physics simulation surface.) The [2025 post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/) already names experience consistency in units and physics. Missing API terms do not erase that intent or establish an exclusion; the group needs to select which observable behaviors its profiles bind or delegate.
 
 
 ## What Open Spatial Lab built and learned
 
-Open Spatial Lab's implementation addresses six of the eight rows in this group through a labeled, non-canonical extension. Every extension is marked `x-osl-extension: true` and `x-osl-divergence: D8` in the schema. No conformance claim is made; `standards_conformance` stays `false` on every response.
+The historical eight-row asset inventory records six local implementation rows. Those labels describe that selected inventory, not asset conformance or complete rendering proof. Every extension is marked `x-osl-extension: true` and `x-osl-divergence: D8` in the schema. No conformance claim is made; `standards_conformance` stays `false` on every response.
 
-**The SpatialFabricSubtree contract** (schema.yaml, lines 716-852, labeled divergence D8). OSL adopts `spatialAssetURI` as the address and adds a strict typed contract at `node.webofworlds_extension.spatial_fabric_subtree`. The contract has four required fields, each required because its absence caused a concrete failure:
+**The SpatialFabricSubtree contract** (schema.yaml, lines 716-852, labeled divergence D8). OSL adopts `spatialAssetURI` as the address and adds a strict typed contract at `node.webofworlds_extension.spatial_fabric_subtree`. The local contract has four required fields, covering address, scale, axis mapping and backend selection:
 
 - `fabricURI` (string): the signed `.msf` spatial document to transclude. Resolved and verified fail-closed; an unverified, unfetchable, or tampered fabric is refused at every nesting level.
-- `unitsPerMeter` (number, must be positive): world units per fabric metre. No default. The compositor folds this into the scale composition rather than post-multiplying, so the engine's own light-intensity rule applies correctly. Without it, a tabletop orrery with 1 AU = 0.5 m in a 1:1-metre room is a valid reading and a catastrophic rendering.
+- `unitsPerMeter` (number, must be positive): world units per fabric metre. No default. The compositor folds this into the scale composition rather than post-multiplying, so the engine's own light-intensity rule applies correctly. For the intentional tabletop model, k = 0.5 / 149597870700 host units per fabric metre. That model reduction must be explicit.
 - `upAxis` (enum: z, y): declared, never sniffed from the content, never defaulted. The host applies a fixed basis change (a pure isometry) for Z-up content; Y-up content passes through unchanged. Without it, a Z-up fabric in a Y-up host renders on its side.
 - `placement` (enum: in-room, backdrop): selects the rendering backend. `in-room` uses a single Three.js scene graph with one shared depth buffer (depth-correct compositing, approximate shading). `backdrop` uses a Filament stacked layer (measured parity, no depth compositing). No default, because the two backends make different honesty claims about what they draw.
 
@@ -57,45 +57,38 @@ Five optional fields address narrower problems:
 - `maxDepth` (integer, minimum 0): per-subtree recursion cap for nested child fabrics. Always clamped by the engine's absolute maximum depth; this dial can only lower the cap, never raise it.
 - `epochTicks` (number): the epoch at which the fabric's map.wasm is run. Fabrics are time-dependent by design (orbits move), so the epoch must be stated rather than implied by wall clock. Without it, two clients viewing the same fabric at different times see different states.
 
-**Evidence and its limits.** OSL's signed-subtree contract checks report 55/55 passing (reported: OSL's own working-group dossier; not re-run in this pass). This count covers the contract shape and verification pipeline, not visual output fidelity. The 55/55 figure was documented by Open Spatial Lab and has not been independently re-run for this report.
+**Evidence and its limits.** The July 11 local contract receipt totals 29 prior checks and 26 additions, including schema/vocabulary, discovery, transform handover and placeholders. Its scene builder used no DOM, fetch, WebAssembly or renderer. The historical total is not a set of cryptographic trials or rendered-fidelity tests; it was not rerun for these edits.
 
 **Asset ingest.** OSL treats `spatialAssetURI` as a glTF/GLB URL by convention and loads real assets through the existing Three.js GLTFLoader stack (deferred conformance ledger, DCL-005 and DCL-008). This works because every asset in the demo world happens to be glTF. The convention is not stated in the spec and would break for any non-glTF asset.
 
 **TeleportXR rendering.** OSL makes no claim about TeleportXR rendering. Every pixel on screen is drawn by OSL's own Three.js and Filament-web renderer. No TeleportXR renderer is embedded, wrapped, or called. This boundary is disclosed, not a failure (wow-spec-coverage.mjs, lines 291-303).
 
-**Claim boundary.** OSL proves that a typed transclusion contract is necessary and that the four required fields (fabricURI, unitsPerMeter, upAxis, placement) each prevent a concrete rendering failure. OSL does not prove that these four fields are sufficient, that the field names are optimal, or that the extension vocabulary should be adopted unchanged.
+**Claim boundary.** The local failures support explicit frame/scale contracts and honest backend capability reporting. They do not prove that Open Spatial Lab's four required properties are a necessary or sufficient universal contract. In particular, its existing unitsPerMeter is host units per fabric metre including model reduction; the proposed world-level units ratio in chapter 01 has a separate meaning.
 
 
 ## Proposed normative text
 
+These are unadopted optional-profile proposals. Schema fragments target OpenAPI 3.0.4. Requiring new properties within an opted-in profile does not make them base API requirements.
+
 ### Baseline asset format
 
-```yaml
-# Add to OpenSpatialAsset or to a conformance profile document
-baseline_asset_format:
-  description: >
-    A conformant server MUST serve at least model/gltf-binary
-    for every asset referenced by Node.spatialAssetURI.
-    model/gltf+json, model/vnd.usdz+zip, and model/x3d+xml
-    are OPTIONAL.
-```
+Candidate decision: for an agreed profile of static mesh assets, require both producer and consumer support for `model/gltf-binary` when the asset can be faithfully represented by that profile. Define profile capabilities, unsupported features and negotiation failure before adoption. A client may offer other formats through its Accept header. If no supported representation exists, use a declared unavailable/unsupported outcome; do not pretend a lossy GLB conversion represents executable or otherwise incompatible content.
 
-Rationale: glTF is the most widely supported 3D asset format on the web; requiring one baseline prevents content-negotiation deadlock.
+This proposal does not require a GLB form of every spatialAssetURI. Signed executable documents and other non-mesh content need their own semantics or explicit fallback.
 
-### spatialAssetURI format constraint
+### spatialAssetURI resolution rule
 
 ```yaml
-# Replace in OpenSpatialWorld Node schema
 spatialAssetURI:
   type: string
-  format: uri
   description: >
-    A URI referencing a spatial asset. A client MUST support
-    model/gltf-binary. A client SHOULD use HTTP content negotiation
-    (Accept header) when fetching the URI.
+    Proposed URI reference for a spatial asset, resolved against the
+    declared asset base (or, when that profile specifies it, the
+    containing Node response retrieval URI) using RFC 3986 section 5.
+    Negotiate a supported representation; report unresolved or unsupported content.
 ```
 
-Rationale: a bare `type: string` with no `format` lets any string through, including relative paths and bare filenames that cannot be resolved.
+A relative path or filename is not inherently invalid. The profile must define its base, allowed schemes and resolution/failure rules. A generic string schema cannot enforce all of that behavior; the URL examples in chapter 06 exercise resolution separately.
 
 ### Transclusion contract for signed spatial documents
 
@@ -107,34 +100,39 @@ SpatialDocumentTransclusion:
     - documentURI
     - unitsPerMeter
     - upAxis
-    - placement
   properties:
     documentURI:
       type: string
-      format: uri
       description: >
-        The signed spatial document to transclude.
+        URI reference of the signed document, resolved against the declared base.
         A client MUST verify the document's signature before
         rendering. An unverified document MUST NOT be drawn.
     unitsPerMeter:
       type: number
-      exclusiveMinimum: 0
+      minimum: 0
+      exclusiveMinimum: true
       description: >
-        World units per document metre. REQUIRED. No default.
-        A client MUST use this value to compose the document's
-        scale into the host scene.
+        Document-local coordinate units per physical metre. No default.
+        Convert source distances by dividing by this value and
+        multiplying by the host unitsPerMeter; model scale is separate.
     upAxis:
       type: string
       enum: [y, z]
       description: >
         The document's up-axis. REQUIRED. No default.
-        A client MUST apply a basis change when the document's
-        up-axis differs from the host scene's up-axis.
+        Resolve the full source and host bases before composition;
+        up-axis alone does not identify handedness or horizontal axes.
+    handedness:
+      type: string
+      enum: [right, left]
+      description: >
+        Optional explicit frame handedness. When omitted, it must be
+        obtained from the declared frame/profile, never guessed.
     placement:
       type: string
       enum: [in-room, backdrop]
       description: >
-        REQUIRED. No default. 'in-room' means the document
+        Optional informative OSL backend hint. 'in-room' means the document
         shares the host scene's depth buffer (depth-correct
         compositing). 'backdrop' means the document renders
         as a separate layer with no shared depth buffer.
@@ -160,28 +158,23 @@ SpatialDocumentTransclusion:
       description: >
         OPTIONAL. The epoch at which the document's
         time-dependent content SHOULD be evaluated.
-        When absent, the client MAY use wall-clock time.
+        The selected time profile must define tick units, epoch origin
+        and behavior when time is not supplied; this sketch does not.
 ```
 
-Rationale: each required field prevents a concrete rendering failure documented in OSL's implementation.
+This candidate transclusion profile requires a document address and known local units/up-axis. A full frame mapping, including known handedness, is still needed; obtain it from explicit metadata or the declared frame/profile, and report unresolved placement when neither supplies it. `placement` and `parallax` describe optional local rendering hints, not a required architecture. A renderer may ignore those hints; this sketch does not establish shared-occlusion conformance. `unitsPerMeter` uses the proposal's local-units-per-metre definition: 100 source units at 100 units/metre becomes one host unit at one unit/metre. The existing OSL `k` additionally contains intentional model reduction. Signed-byte scope, mutable parent transforms, publisher trust, execution permissions, cycles and limits remain explicit profile decisions.
 
 ### Engine-internal scope statement
 
-The following sentence SHOULD appear in the specification's scope section:
-
-> Physics simulation, audio spatialization, and input device mapping are out of scope. These surfaces are adopted by reference from engine-level standards and specifications (glTF extensions for physics, Web Audio API for spatialization, WebXR Input for device mapping). A conformant Web of Worlds implementation MUST NOT require a specific physics, audio, or input pipeline.
-
-Rationale: silence is ambiguous; an explicit scope statement tells implementers these surfaces are intentionally absent.
-
+Proposed scope statement: WoW defines the agreed interchange behavior; rendering, physics, audio and input mechanisms remain implementation choices unless a named profile requires a specific observable result. Existing standards may be referenced for those domains after the group chooses the boundary. This report does not claim that a keyword search proves the architecture excludes them, or that one library provides every required binding.
 
 ## Adoption path
 
-**For a minimal world (leaf assets only):** a server declares `model/gltf-binary` support for every asset node. A client fetches `spatialAssetURI` with an `Accept: model/gltf-binary` header. No transclusion contract is needed. This path requires only the baseline-format addition and the `format: uri` constraint on `spatialAssetURI`.
+**Existing worlds.** Current media negotiation and node assets remain valid. The static-mesh baseline is a candidate optional profile with an explicit supported-content scope. Adding required data or restricting formats in the base API would need a separate compatibility decision.
 
-**What a client must do:** support `model/gltf-binary` at minimum. When a node carries a transclusion contract, verify the signed document before rendering, apply the declared `unitsPerMeter` and `upAxis`, and select the rendering backend from `placement`. Clamp `maxDepth` to the client's own engine limit.
+**Clients.** Resolve URI references against the agreed base, negotiate a representation and report unsupported content. Under a signed-subtree profile, verify the required payload, apply the declared frame mapping and enforce local execution/resource policy. A valid signature alone is not permission to execute.
 
-**What a server must do:** serve at least `model/gltf-binary` for every `spatialAssetURI`. When a node transcludes a signed spatial document, populate the transclusion contract with all four required fields. Omitting any required field is a schema error.
-
+**Servers.** Advertise supported representations and profiles. Supply the metadata required by an adopted profile. Do not claim fidelity for content converted into an inadequate representation. Backend hints remain optional and do not choose another implementation's renderer.
 
 ## Open questions for the working group
 
@@ -189,21 +182,21 @@ Rationale: silence is ambiguous; an explicit scope statement tells implementers 
 
 2. **Rendering conformance.** Does Web of Worlds conformance require a specific rendering pipeline, or is any web renderer that consumes the composition graph valid? OSL draws every pixel with its own Three.js/Filament-web renderer and makes no claim about TeleportXR rendering.
 
-3. **Baseline format beyond glTF.** Should the standard require support for a second format (USD, X3D) in addition to glTF, or is one baseline sufficient? Each additional required format raises the implementation floor.
+3. **Baseline format beyond glTF.** Which asset use case should a baseline cover, and is GLB an adequate common representation for that case? What happens when content cannot be represented faithfully? Each additional required format raises the implementation floor.
 
 4. **Physics, audio, and input: scope statement vs. extension track.** Should the scope exclusion be a final statement, or should the standard reserve an extension point for future physics/audio/input vocabularies? The current recommendation is a scope statement only.
 
 
 ## Sources
 
-- OpenSpatialWorld/API.yaml at commit d39a1a0: [github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml)
-- OpenSpatialAsset/API.yaml at commit d39a1a0: [github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml)
-- OpenSpatialWorld/README.md at commit d39a1a0: [github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md)
-- Open Spatial Lab schema (SpatialFabricSubtree): `repo/open-spatial-lab/wow-spec/schema.yaml`, lines 716-852
-- Open Spatial Lab deferred conformance ledger (DCL-005, DCL-008): `repo/open-spatial-lab/.dev/ai/deferred-conformance-ledger.md`
-- Open Spatial Lab spec coverage (first-party renderer boundary): `repo/open-spatial-lab/web/wow-spec-coverage.mjs`, lines 291-303
-- Open Spatial Lab working-group dossier (55/55 contract checks): `repo/open-spatial-lab/docs/WORKING-GROUP-DOSSIER.md`
+- [OpenSpatialWorld/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenSpatialAsset/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenSpatialAsset/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/README.md), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf); relevant printed pages are identified in this chapter or [chapter 10](10-role-and-blind-spots.md).
+- [OpenAPI 3.0.4 Schema Object](https://spec.openapis.org/oas/v3.0.4.html#schema-object).
+- Open Spatial Lab local source snapshot and retained evidence, checked September 7, 2026: schema.yaml, deferred-conformance-ledger.md and wow-spec-coverage.mjs. The July 11 mixed contract total is 29 prior checks plus 26 additions, not rendered-subtree or cryptographic trials. No fresh renderer run is claimed. Public reproduction of these exact local bytes is not established.
+- [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve the historical surface/finding identifiers.
 
 ## Change log
 
-- 2026-09-07: first public draft, verified.
+- 2026-09-07: corrected source scope, proposal compatibility and evidence boundaries; updated public citations.

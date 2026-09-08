@@ -1,10 +1,10 @@
 # Presence, Live Sync, and Persistence
 
-The Web of Worlds specification defines a REST API that can describe a world as a snapshot, but it provides no wire contract for real-time events, no session lifecycle semantics, no rules for when a visitor registers presence, and only two one-line rows for persistence and sharing. A second implementation that tried to add multi-user presence or URL-based persistence would have to invent the same contracts Open Spatial Lab invented, with no guarantee of agreement.
+The pinned OpenSpatialWorld API and README define snapshot resources and graph operations, but do not bind a live event transport, session lifecycle or presence-registration procedure. Persistence and sharing each have a short README row. The whitepaper supplies broader architectural intent. A second implementation that tried to add multi-user presence or URL-based persistence would have to invent the same contracts Open Spatial Lab invented, with no guarantee of agreement.
 
-The standard needs four additions (each detailed below): a real-time event channel for presence and node changes (inferred from implementation); session lifecycle semantics for the join, follow, and preview verbs (verified in code); completion of the truncated Preview description that governs whether preview visitors create server-side state (verified against the spec text); and a rule that persisted and shared URLs carry their fragment so the user returns to the same world, aspect, and mode (verified in code).
+Four proposed bindings would make the reviewed entry and live-state behavior more precise: a negotiated event transport and recovery contract, session/presence lifecycle semantics, alignment of the truncated Preview description with the published preview-and-authorization intent, and preservation of address components on persist/share. Event names alone are insufficient. These are unadopted candidates drawn from one implementation.
 
-Two further gaps sit at the persistence layer: portable inventory (a user who crosses a portal cannot carry items; inferred from the architecture map) and portable preferences (accessibility settings do not travel between worlds; reported from whitepaper-vs-schema comparison). Both are blind spots with no covering standard anywhere in the standards landscape.
+Portable inventory and preferences are separate extension questions. The reviewed API lacks those bindings, while the whitepaper describes portable user information and user-controlled disclosure. This does not establish that no other standard addresses them, or that they depend technically on Portal.destination adoption.
 
 Status: Specification examined at commit d39a1a0 (WebOfWorlds/WoWAPI main, checked 2026-09-07).
 
@@ -22,7 +22,7 @@ Status: Specification examined at commit d39a1a0 (WebOfWorlds/WoWAPI main, check
 - Follow: "follow the world as new or existing user"
 - Preview: "experence world without"
 
-The Preview description is truncated. The sentence ends at "without" with no object. No further text in the repository completes it. Join and Follow both say "as new or existing user"; Preview does not.
+The pinned README description stops at "without". The [Linked Spatial Experiences: The Web of Worlds, April 2, 2025](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/) post supplies the missing context: preview creates no additional user, while user-based authorization is still needed. The README should carry that intent into its entry contract. Join and Follow both say "as new or existing user"; the preview rule distinguishes user creation from authorization.
 
 **Follower visibility and departure.** The specification does not state whether a follower is visible to other users, whether a follower counts toward `active_user_count`, or what happens when the followed aspect leaves the world. Searching for `depart`, `departure`, `leave`, `visible`, and `follower` across API.yaml and README.md returns zero results.
 
@@ -41,9 +41,9 @@ Neither row states whether the URL must include its fragment, whether the fragme
 
 ## What fails without it
 
-**No live world.** An implementer who builds a multi-user spatial experience on the current API gets a REST endpoint that returns a snapshot. When a second user joins, the first user's client has no way to learn about it except by polling GET /wow/world. Node creation, movement, and deletion are likewise invisible until the next poll. The API describes a world; it does not describe a world that is alive.
+**Live updates lack an agreed binding.** The API supplies snapshots and graph operations. An implementation can add polling or an event service, but the reviewed contract does not define discovery, event transport, snapshot revision, ordering, replay or reconnect behavior. Independently chosen mechanisms need not converge on the same world state.
 
-**Two implementations disagree on preview visibility.** The Preview description is truncated at "experence world without." One implementation may read "without" as "without joining" (no session, no presence). Another may read it as "without cost" or "without full features" and register the preview visitor as present. A preview visitor who appears in one server's user count but not another's breaks interoperability at the most basic level: two clients connected to the same world would disagree on how many people are in it.
+**Preview intent needs an API binding.** The 2025 post already separates preview from creation of an additional user and retains user-based authorization. The incomplete README does not bind that intent to presence counts, participation records or authorization failures. Clients should not infer that preview grants anonymous access to protected resources.
 
 **Follower breakage on departure.** When a followed aspect leaves the world, a follower has no defined state to fall back to. One implementation may freeze the camera. Another may switch to a free camera. A third may eject the follower entirely. Without a rule, the follower's experience after departure depends on which server they connected to.
 
@@ -51,31 +51,33 @@ Neither row states whether the URL must include its fragment, whether the fragme
 
 **Bookmarked URLs lose state.** A user who bookmarks `https://example.com/world/#follow=avatar-7` and later restores it expects to return to the same world, following the same aspect, in follow mode. If the specification does not require the fragment to survive, an implementation that strips it on persist or share would silently demote the user to a bare join.
 
-**Portable inventory is absent.** A user who acquires an item in World A and walks through a portal to World B cannot bring the item. The IWPS portal protocol reserves an `assets` parameter but defines no schema for it. Without a portable-inventory contract, every world is a walled garden for carried items.
+**Inventory transfer is not bound here.** No interoperable carried-item contract was located in the reviewed WoW API. Other identity or item systems can carry data, but the group still needs to decide whether and how this API refers to them, including permissions, provenance and destination acceptance. This is a scoped binding gap, not a worldwide absence finding.
 
-**Preferences do not travel.** A user who sets accessibility preferences (text size, color contrast, motion reduction) in one world loses them in the next. The WoW whitepaper's "Digital YOU" section claims "Preferences & settings," but the OpenUserManifest schema carries only `name`, `age`, and `avatarAssetURI` (reported: whitepaper-vs-schema comparison from R3 analysis).
+**Preference exchange is not bound here.** The whitepaper describes preferences/settings and selective disclosure. The pinned UserManifest.content schema has name, age and avatarAssetURI, without a preference vocabulary. A portable preference contract must also specify consent and what a destination supports; serialization alone does not ensure accessibility behavior.
 
 ## What Open Spatial Lab built and learned
 
-**WebSocket /events channel.** OSL implemented a WebSocket endpoint at `/events` that emits labeled events: `user_joined`, `user_left`, `node_created`, `node_updated`, `node_deleted`. This channel is documented in OSL's contract specification as a "labeled non-canonical realtime convention" and is kept out of the OpenAPI HTTP contract on purpose (verified: `repo/open-spatial-lab/wow-spec/OSL-WOW-CONTRACT.md` lines 127-133). The upstream `simpleWorlds` reference implementation registers the WebSocket handler before its validator, so socket messages are unvalidated; OSL follows the same pattern, implementing realtime as a labeled convention (WO-015). This is a labeled extension, not a canonical feature.
+**WebSocket /events channel.** Open Spatial Lab documents a labeled non-canonical WebSocket channel with `user_joined`, `user_left`, `node_created`, `node_updated` and `node_deleted`. This is a local convention, not an interoperable transport/recovery profile. No fresh multi-user network run or inspection of another implementation's internals is claimed here.
 
-**Presence registration by intent (Interpretation I5).** OSL implemented a rule: join and follow register presence (create a session and a user record); preview does not. The reasoning is documented in source code comments (verified: `repo/open-spatial-lab/web/wow-url.mjs` lines 221-254). For preview, OSL completed the truncated spec sentence as "experience world without joining it," meaning no session, no presence registration, no visibility to other users. OSL states plainly that the words "without joining" are its own, not the specification's. For follow, OSL relied on the fact that the Follow row says "as new or existing user," the same words as Join, concluding that follow is a presence-registered mode with an attached viewpoint rather than a subscribe-only mode.
+**Presence registration by intent (Interpretation I5).** OSL implemented a rule: join and follow register presence (create a session and a user record); preview does not. The reasoning is documented in source code comments (verified: `wow-url.mjs` lines 221-254). For preview, OSL uses no participation session, presence registration or visibility to other users. That local interpretation agrees with the 2025 post's no-additional-user intent. The cited entry parser does not implement the post's user-based authorization requirement; authorization remains a separate binding. For follow, OSL relied on the fact that the Follow row says "as new or existing user," the same words as Join, concluding that follow is a presence-registered mode with an attached viewpoint rather than a subscribe-only mode.
 
-**Follower visibility and departure fallback.** OSL registers a follower as an ordinary present user (visible to others) and falls back to a free camera if the followed aspect leaves the world (verified: `repo/open-spatial-lab/web/wow-url.mjs` lines 247-249). This is a gap-filling decision, not a spec-stated rule.
+**Follower visibility and departure fallback.** OSL registers a follower as an ordinary present user (visible to others) and falls back to a free camera if the followed aspect leaves the world (verified: `wow-url.mjs` lines 247-249). This is a gap-filling decision, not a spec-stated rule.
 
-**Bare #follow follows the world (Interpretation I6).** OSL interpreted bare `#follow` (no aspect.id) as "follow the world itself": register presence and track the world's live state with a free camera, flagged as following so a follow-target can be attached later without a reload (verified: `repo/open-spatial-lab/web/wow-url.mjs` lines 256-268). The spec's Core Requirements table titles this row "Follow world," and the aspect form is the optional variant.
+**Bare #follow follows the world (Interpretation I6).** OSL interpreted bare `#follow` (no aspect.id) as "follow the world itself": register presence and track the world's live state with a free camera, flagged as following so a follow-target can be attached later without a reload (verified: `wow-url.mjs` lines 256-268). The spec's Core Requirements table titles this row "Follow world," and the aspect form is the optional variant.
 
-**Persist/share URLs carry the fragment (Interpretation I8).** OSL's `buildWorldUrl` function serializes the full URL including the fragment, so that bookmarking or sharing returns the user to the same world, aspect, and mode (verified: `repo/open-spatial-lab/web/wow-url.mjs` lines 437-461). A bare join emits the clean URL with no fragment, since the spec lists bare `URL` as the Join feature. This is a labeled interpretation: the spec says "store or bookmark URL" and "send URL to second user," and OSL reads "URL" as including the fragment because a URL includes its fragment by definition (RFC 3986).
+**Persist/share URLs carry the fragment (Interpretation I8).** OSL's `buildWorldUrl` function serializes the full URL including the fragment, so that bookmarking or sharing returns the user to the same world, aspect, and mode (verified: `wow-url.mjs` lines 437-461). A bare join emits the clean URL with no fragment, since the spec lists bare `URL` as the Join feature. This is a labeled interpretation: the spec says "store or bookmark URL" and "send URL to second user," and OSL reads "URL" as including the fragment because a URL includes its fragment by definition (RFC 3986).
 
-**Claim boundary.** All of the above are single-implementation readings of a specification that does not address these topics. None proves that the readings are the only valid ones, and none proves interoperability with a second implementation that made different choices.
+**Claim boundary.** These are local interpretations and implementation facts. The source server removes an identified player at accepted exit-intent, before visual crossing; its five-second tombstone blocks immediate stale-heartbeat upserts. The client's later depart call is a confirmation, followed by destination registration. The client-only failure probe omitted the source exit-intent handler and is not a two-server crossing result. Lost requests, lost replies, late heartbeats and lease expiry have distinct effects, described in [chapter 02](02-portal-destination-and-traversal.md). Session authority, visual continuity and per-world occupancy remain separate.
 
 ## Proposed normative text
 
+All additions are unadopted proposals. Schema fragments target OpenAPI 3.0.4; the session/options mappings below are explanatory data sketches, not OpenAPI Schema Objects. The group must select a coherent profile before these words become requirements.
+
 ### Real-time event channel
 
-A conformant server SHOULD provide a WebSocket or Server-Sent Events endpoint for real-time events.
+A future live-state profile should provide endpoint discovery and at least one common mandatory transport binding, or negotiation that selects a mutually supported binding. WebSocket and Server-Sent Events are candidates; independently allowing either one does not ensure two implementations can connect.
 
-Rationale: the REST API describes snapshots; a spatial world needs live updates.
+Rationale: a live-state profile needs defined update behavior alongside the existing snapshot API.
 
 At minimum, the following event types SHOULD be defined:
 
@@ -91,13 +93,13 @@ EventType:
     - node_deleted
 ```
 
-The specification SHOULD leave the transport choice (WebSocket vs SSE) to the implementer but MUST define the event-type vocabulary so that a client from one implementation can parse events from another.
+The vocabulary above is only a starting set. A profile must additionally define event payloads, world/session scope, authentication and authorization, event/revision identifiers, snapshot-to-stream ordering, duplicate handling, resume/expiry behavior and resynchronization when history is unavailable. Agree one dropped-event, duplicate-event and reconnect fixture before calling the channel interoperable.
 
-Rationale: interoperability requires a shared vocabulary; transport flexibility allows servers to match their infrastructure.
+Rationale: a shared name does not establish whether an event is new, duplicated or already reflected in the loaded snapshot. Those observable behaviors determine whether clients converge after failure.
 
 ### Session lifecycle semantics
 
-The specification SHOULD define explicit state transitions for the three entry verbs:
+Candidate lifecycle semantics follow. In this sketch, session means a participation/presence record; preview can still require an authenticated transport or private-resource authorization. The group must define departure acknowledgement, lease expiry, retry and recovery separately. These entries do not specify a distributed ownership transaction.
 
 ```yaml
 # Session lifecycle states
@@ -119,9 +121,10 @@ SessionLifecycle:
     creates_session: false
     registers_presence: false
     description: >
-      The user experiences the world without joining it.
-      No session is created. The user is not visible to other users
-      and is not counted in active_user_count.
+      No additional user or participation session is created.
+      The visitor is not counted in active_user_count.
+      User-based authorization still applies to protected access;
+      an authenticated access session is separate from presence.
   depart:
     description: >
       The user leaves the world. The session is ended and the user
@@ -130,9 +133,9 @@ SessionLifecycle:
 
 Rationale: without these definitions, two implementations will disagree on whether a preview visitor is visible, which breaks the most basic interop test (user count).
 
-The specification MUST complete the Preview description. The current text "experence world without" is truncated and does not state its object.
+Proposed correction: complete the Preview description using the 2025 post's no-additional-user and authorization distinction. Define how that maps to presence counts and access-denied responses.
 
-Rationale: a truncated sentence in a normative table forces every implementer to guess its meaning.
+Rationale: the published intent exists; the README and observable entry behavior should agree with it.
 
 ### Follower rules
 
@@ -168,7 +171,7 @@ Rationale: the Core Requirements table lists `URL#follow` as valid but does not 
 
 ### Persist and share fragment rule
 
-The specification SHOULD state that a persisted or shared URL MUST include the fragment.
+Proposed rule: preserve the complete resolved entry URL, including query and fragment semantics. Restoration should re-enter the encoded world, aspect and mode when still available; an expired or missing aspect requires a defined failure/fallback rule. A bookmark does not freeze mutable world content.
 
 Rationale: a URL that loses its fragment loses the user's mode and target aspect.
 
@@ -177,9 +180,9 @@ Rationale: a URL that loses its fragment loses the user's mode and target aspect
 PersistShareRule:
   description: >
     A persisted (bookmarked) or shared URL MUST include the
-    URL fragment. Restoring or opening the URL MUST return the
-    user to the same world, aspect, and mode encoded in the
-    fragment. A bare URL (no fragment) is equivalent to #join.
+    URL fragment. Restoring or opening the URL requests the
+    encoded world, aspect and mode; unavailable targets use
+    the profile's explicit resolution/failure behavior. A bare URL (no fragment) is equivalent to #join.
 ```
 
 Rationale: without this rule, "store or bookmark URL" could be satisfied by an implementation that strips the fragment.
@@ -188,7 +191,7 @@ Rationale: without this rule, "store or bookmark URL" could be satisfied by an i
 
 This is an optional extension track, not a core requirement.
 
-The specification SHOULD define a portable-inventory schema or adopt one by reference from Universal Manifest's equipped-items vocabulary.
+The specification SHOULD define a portable-inventory schema or evaluate a named, versioned Universal Manifest equipped-items profile by reference.
 
 ```yaml
 # Portable inventory item (optional extension)
@@ -211,7 +214,7 @@ InventoryItem:
       description: "Origin world or authority that issued the item"
 ```
 
-Rationale: without an inventory contract, items cannot cross portal boundaries.
+Rationale: a shared item reference can support transfer, but receiving permission and continued use require the chosen rights/admission contract. Inventory exchange can be developed independently of portal traversal.
 
 ### Portable preferences (optional extension)
 
@@ -229,6 +232,8 @@ UserPreferences:
       properties:
         text_scale:
           type: number
+          minimum: 0
+          exclusiveMinimum: true
           description: "Multiplier for default text size"
         reduced_motion:
           type: boolean
@@ -248,27 +253,27 @@ UserPreferences:
       description: "Preferred rendering quality tier"
 ```
 
-Rationale: the whitepaper promises portable preferences but the manifest schema does not carry them.
+Rationale: the whitepaper describes portable preferences; the pinned manifest schema does not bind that vocabulary.
 
 ## Adoption path
 
-**What stays valid for a minimal world.** A world that serves only the current REST API (GET /wow/world, GET /wow/user/{id}, and the spatial graph endpoints) remains a valid world. The real-time channel, session lifecycle semantics, and fragment rules are additions, not changes to existing endpoints.
+**Existing implementations.** These proposals do not change the base endpoint schemas. A chosen live-state or entry profile adds behavior that existing implementations may not support; it must be advertised and tested. Serving selected routes alone is not a new claim of full conformance.
 
-**What a client must do.** A client that wants live presence SHOULD connect to the server's event channel (WebSocket or SSE) after loading the world via REST. A client that bookmarks or shares a URL SHOULD preserve the fragment. A client that opens a `#preview` URL SHOULD NOT register presence or create a session.
+**Clients adopting a future profile.** Negotiate a supported live-state binding, establish snapshot/revision state, then apply events under its replay/resync rules. Preserve entry URL components on persist/share. Apply the agreed preview participation rule without bypassing resource authorization.
 
-**What a server must do.** A server that supports multi-user presence SHOULD implement the event channel with the defined event-type vocabulary. A server SHOULD accept and honor the session lifecycle semantics (join creates presence, preview does not). A server that serves the Core Requirements MUST complete the Preview description and MUST define follower departure behavior.
+**Servers adopting a future profile.** Advertise transport and recovery capabilities, implement the agreed join/follow/preview behavior, and define acknowledgement and expiry of presence. Do not imply that a successful destination registration proves the source record was removed.
 
 ## Open questions for the working group
 
-1. **Event transport.** Should the standard mandate WebSocket, SSE, or leave it open? Mandating one simplifies interop testing. Leaving it open gives servers flexibility but requires clients to support both.
+1. **Event transport.** Should the standard mandate WebSocket, SSE, or leave it open? Mandating one simplifies interop testing. Alternatives require explicit common support or negotiation plus an unsupported-binding outcome; transport names alone are insufficient.
 
-2. **Preview sentence.** The working group must complete the truncated Preview description ("experence world without"). The reading "without joining" is the most natural completion, but the group must confirm it.
+2. **Preview binding.** How should the 2025 post's no-additional-user and user-based-authorization intent map to presence counts, access sessions and failure responses in the API?
 
 3. **Follower departure.** Should a follower revert to a free camera, be ejected, or freeze? OSL chose revert-to-free-camera. The group should pick one default and state it.
 
 4. **Bare #follow.** Should bare `#follow` follow the world, follow a default viewpoint, or be an error? OSL chose follow-the-world (join with a follow flag).
 
-5. **Inventory scope.** Should inventory be a core feature or an optional extension track? It depends on Portal.destination landing first (a portal without a destination field cannot carry inventory across it).
+5. **Inventory scope.** Should inventory be a core feature or an optional extension track? The data and permission contract can be developed independently of Portal.destination; portal transfer is one consumer.
 
 6. **Preference scope.** At minimum, accessibility preferences (per WCAG) should be portable. Should input preferences and rendering quality also be included, or should those wait for implementation experience?
 
@@ -276,15 +281,16 @@ Rationale: the whitepaper promises portable preferences but the manifest schema 
 
 ## Sources
 
-- WebOfWorlds/WoWAPI specification at commit d39a1a0: [API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), [README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md)
-- Open Spatial Lab contract specification: `repo/open-spatial-lab/wow-spec/OSL-WOW-CONTRACT.md` lines 127-133
-- Open Spatial Lab URL handling and interpretations: `repo/open-spatial-lab/web/wow-url.mjs` lines 221-268, 437-461
-- Completion Map rows CM-032, CM-033, CM-034, CM-035, CM-055
-- Findings rows R-003, R-004, R-012, R-024
-- Findings and Recommendations document rows 3, 4, 12, 24 (blind spots and known gaps)
-- RFC 3986 (Uniform Resource Identifier): defines that a URI includes its fragment component
-- Proof ledger: `.dev/ai/roles/project-steward/proof-ledger.md` (48/48 crossing-continuity and 55/55 signed-subtree counts are documented by OSL, not re-run in this pass; medium confidence until re-run)
+- [Linked Spatial Experiences: The Web of Worlds, April 2, 2025](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/): published units, preview, authorization and aspect intent.
+
+- [OpenSpatialWorld/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenSpatialWorld/README.md](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [OpenUserManifest/API.yaml](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml), WoWAPI 0.0.1 at d39a1a0, checked September 7, 2026.
+- [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf); relevant printed pages are identified in this chapter or [chapter 10](10-role-and-blind-spots.md).
+- [RFC 3986, URI syntax and resolution](https://www.rfc-editor.org/rfc/rfc3986).
+- Open Spatial Lab local source snapshot and retained evidence, checked September 7, 2026: OSL-WOW-CONTRACT.md and wow-url.mjs, including entry interpretations and URL serialization. The source exit-intent removal and finite tombstone were checked in runtime-state.js. The retained September 7 in-memory failure probe uses only the client presence controller and bypasses that source handler; it is not a two-server result or proof of exclusive session authority. Public reproduction of these exact local bytes is not established.
+- [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve the historical surface/finding identifiers.
 
 ## Change log
 
-- 2026-09-07: first public draft, verified.
+- 2026-09-07: corrected source scope, proposal compatibility and evidence boundaries; updated public citations.
