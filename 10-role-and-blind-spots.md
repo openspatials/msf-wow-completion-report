@@ -1,10 +1,58 @@
 # Web of Worlds among its neighbors: role and open questions
 
-WoWAPI 0.0.1 defines resources, composition-graph operations and asset negotiation. Its whitepaper describes units and origins, internal and external node references, portable user information, human and AI access, and selective feature implementation. The local implementation exposed incomplete bindings for interoperable world transitions. This report offers candidate fields, profiles and tests that connect the architecture to observable behavior.
+WoWAPI 0.0.1 defines resources, composition-graph operations and asset negotiation. Its whitepaper describes units and origins, internal and external node references, portable user information, human and AI access, and selective feature implementation. The local implementation exposed incomplete bindings for composition, client behavior, shared state and world transitions. This report connects those findings to the whole architecture and proposes contracts and tests for ongoing operation as well as traversal.
 
 The questions below concern coordinate agreement, shared spatial anchors, portable inventory, preferences, software-agent declarations and governance. They do not establish that no standard addresses these subjects, or that Web of Worlds should own all of them. The selected infrastructure map contains 102 rows across six reviewed subjects. Those rows describe that corpus; their empty cells are neither worldwide absence proofs nor measures of standards completion.
 
-**Source boundary:** WoWAPI commit d39a1a0, checked September 7, 2026, and the March 31, 2026 whitepaper. The technical chapters distinguish published architecture, API bindings, local implementation evidence and unadopted proposals. [Chapter 11](11-published-positions-and-current-state.md) gives the publication comparison; [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve historical row identifiers.
+**Source boundary:** WoWAPI commit d39a1a0, rechecked September 11, 2026, and the March 31, 2026 whitepaper. The technical chapters distinguish published architecture, API bindings, local implementation evidence and unadopted proposals. [Chapter 11](11-published-positions-and-current-state.md) gives the publication comparison; [Appendix A](A-completion-map.md) and [Appendix B](B-findings-register.md) preserve historical row identifiers.
+
+## The whole architecture and its connections
+
+The system must support places and objects that stay where they are, people and software that act on them, and navigation between contexts. Traversal is one operation within that system. The following map describes required responsibilities and proposed binding work; it is not a claim that a complete open metaverse has been implemented or that every concern belongs in the base Web of Worlds API.
+
+| Area | Responsibility | Connection to the rest of the system |
+|---|---|---|
+| Worlds and distributed entities | Identify graphs, objects, instances and referenced content | Discovery resolves them; placement relates their frames; clients load them; authority controls their changes. |
+| Clients and behavior | Render supported content, interpret input, request actions and reflect updates | Content profiles define meaning; state services accept changes; permissions bound execution and access. |
+| People and software actors | Present identity/evidence, preferences and requested capabilities | Manifest and authorization profiles connect the actor to resource access, action decisions and revocation. |
+| Authority, live state and storage | Decide accepted changes, distribute revisions and preserve promised state | Clients submit actions and resynchronize; durable stores define recovery; remote inclusion preserves each service's responsibility. |
+| Cross-world connections | Resolve entry, include remote content or navigate to another context | Addressing, graph identity, frames, portable data and participation must agree at each boundary. |
+| Conformance and coordination | Name profiles, versions, owners and observable outcomes | Independent implementations run shared cases for ongoing operation and traversal. |
+
+Three flows connect the areas. **Resolve → place → present** brings a stationary entity into a client's view. **Input → authorize → apply → publish** changes shared state while everyone remains in that world. **Persist → reconnect → restore** establishes what survives interruption. A portal transition combines these flows with destination admission and a change of participation context. Treating the transition as the whole system would leave the ordinary operating loop unexplained.
+
+The report's ten technical subject chapters cover these areas from different angles. The chapter order is a reference structure, not a requirement that every client perform every step or that a stationary object undergo traversal. [Appendix A](A-completion-map.md) retains the earlier selected surface inventory, and [Appendix B](B-findings-register.md) retains the earlier findings. Their historical counts are not a completeness test for the architecture.
+
+### What Web of Worlds supports, should bind and should reference
+
+**Supports today:** the published world/resource architecture, graph and node operations, asset negotiation, user-manifest resource access and entry intentions. The whitepaper also describes broader composition, human/AI and selective-implementation goals. These are different evidence classes: published intent is not necessarily a complete wire binding.
+
+**Should bind for a selected profile:** world and object identity, resource and service resolution, frame conventions, required behavior, versioned cross-layer references, compatibility and observable failure. The group should define which parts a participant must implement and how unsupported parts are reported. These responsibilities apply to the stationary operating loop as well as navigation.
+
+**Should reference or delegate:** content formats and renderers, identity/credential mechanisms, authorization and policy systems, live-session transports, storage implementation and specialist localization. Referencing a system does not remove the need to specify the handoff to it. It establishes which specification owns each meaning and how the chosen profile uses that meaning.
+
+### Specialist interfaces and accountable owners
+
+| Interface to settle | Work supplied by the specialist | Binding and decision for this group |
+|---|---|---|
+| Portable information | A selected Universal Manifest version and its schema/verification rules | Define a visitor/actor profile, the relationship to OpenUserManifest access, disclosure and compatibility; adoption remains proposed. |
+| Identity and authorization | Identifier methods, credential trust, delegated permissions and revocation | Identify the required assurance, resource/action scope and denied/expired outcome; a declaration is not a grant. |
+| Spatial content and client host | A content format, behavior model and executable-host contract | State supported capabilities, representation negotiation, lifecycle, fallback and observable meaning. |
+| Live state and sessions | Snapshot/update, input, ordering and recovery facilities | Name the authority, profile/version, discovery and access binding; compare stationary shared-state outcomes. |
+| Durable storage | A service's write and restart guarantees | State what an acknowledgement promises and how clients retrieve that result; no database choice is imposed. |
+| Earth placement and shared anchors | GeoPose semantics or a selected localization service | Bind local frames, precision, anchor namespace, permission and lifetime; a local pose is not shared localization. |
+| Portal coordination | A selected transition specification, such as OMA3 IWPS | Bind destination resolution, admission, portable references and interrupted outcomes without assuming compliance. |
+| Conformance and maintenance | Versioned requirements, fixtures and independent implementers | Agree scope, acceptance evidence, compatibility and the responsible standards/maintainer contacts. |
+
+The ecosystem corpus is useful because it separates roles that can otherwise all be called “servers”: a signed-resource host, a manifest resolver, a mutable scene service and a live-session runtime. Likewise, the browser/composition engine and the rendering backend are not the same role. Their evidence is unequal. Historical RP1/Artemis receipts exercise named paths; much of the neighboring runtime material is a documentation read; Universal Manifest's equipped-item mapping remains a profile proposal. None of those sources establishes that the whole combination interoperates.
+
+### People and software in ongoing operation
+
+Human and software actors both need discoverable actions and explicit outcomes. Their declarations can differ, but neither receives authority merely by appearing in a world. A software actor may act for an operator under a limited grant. The profile must bind who issued the grant, which resources/actions it covers, when it expires, how it is revoked, and whether the current request is made under that grant. An advertised capability such as navigation is neither a grant nor a proof of competence.
+
+Apply the same distinctions during continued operation: read an object, request a mutation, subscribe to restricted state, execute a subtree and leave a session are separate operations. Permission can change while the actor remains present. The state authority must enforce the current grant, and the client must receive a defined refusal or revocation outcome. A signed manifest and a fresh holder challenge can supply evidence without deciding that policy.
+
+The proposed workshop test uses one human-controlled client and one software actor, each requesting an operation on the same stationary object. An allowed action changes its accepted revision. An out-of-scope action and an action after revocation do not. Both clients recover the promised durable state after reconnecting. This tests the human/AI intent against observable behavior and complements the avatar, hat and hammer crossing case. [Chapter 05](05-presence-live-sync-and-persistence.md#ongoing-operation-actions-authority-and-durable-state) provides the state contract, [chapter 03](03-portable-user-state-and-identity.md#permission-lifetime-during-ongoing-operation) the evidence/grant distinction, and [chapter 09](09-conformance-vocabulary-and-errata.md#behavioral-coverage-beyond-portal-traversal) the combined acceptance matrix.
 
 ## What the sources define
 
@@ -18,7 +66,7 @@ The questions below concern coordinate agreement, shared spatial anchors, portab
 
 **Software agents and implementation scope.** Whitepaper page 25 describes common human/AI access and spatial operators; page 26 describes selective feature implementation and future levels. A dedicated agent-declaration, delegation or cross-world permission binding was not located in the pinned APIs. These published aims must not be described as concepts the initiative never considered.
 
-**Governance.** Whitepaper page 30 describes an X3D profile and standards-body adoption path. That is relevant organizational context. The retained meeting/topic table is a discovery aid; its keyword counts do not establish how often a topic was meaningfully discussed, how much time it received, or whether a formal document exists elsewhere. A current charter, contribution policy or liaison document should be located in the initiative's authoritative sources before asserting an organizational gap.
+**Governance.** Whitepaper page 30 describes an X3D profile and standards-body adoption path. That is relevant organizational context. A current charter, contribution policy or liaison document should be located in the initiative's authoritative sources before asserting an organizational gap.
 
 ## Questions exposed by this review
 
@@ -115,13 +163,13 @@ Candidate request: publish authoritative pointers to the initiative's decision p
 
 - [Linked Spatial Experiences: The Web of Worlds, April 2, 2025](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/): published units, preview, authorization and aspect intent.
 
-- [OpenSpatialWorld API 0.0.1 at d39a1a0](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), [OpenSpatialAsset API](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml), [OpenUserManifest API](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml) and [OpenSpatialWorld README](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md), checked September 7, 2026.
+- [OpenSpatialWorld API 0.0.1 at d39a1a0](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/API.yaml), [OpenSpatialAsset API](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialAsset/API.yaml), [OpenUserManifest API](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenUserManifest/API.yaml) and [OpenSpatialWorld README](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a0/specification/OpenSpatialWorld/README.md), rechecked September 11, 2026.
 - [Web of Worlds whitepaper, March 31, 2026](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf), printed pages 7, 15, 22, 25, 26, 28 and 30.
 - [OGC GeoPose 1.0](https://docs.ogc.org/is/21-056r11/21-056r11.html), Basic YPR frame and extension requirements.
 - [WebXR Anchors Module](https://immersive-web.github.io/anchors/), draft consulted September 7, 2026: tracked anchor spaces; no cross-device acceptance result is claimed here.
 - [OpenAPI 3.0.4 Schema Object](https://spec.openapis.org/oas/v3.0.4.html#schema-object) and [W3C Verifiable Credentials 2.0 trust model](https://www.w3.org/TR/vc-data-model-2.0/#trust-model).
 - Selected local infrastructure map and topic inventory, September 7, 2026: 102 authored map rows and keyword-discovery material. Public reproduction of these exact local artifacts is not established. Neither establishes worldwide absence or comparative discussion frequency.
-- Open Spatial Lab source snapshot and retained local numerical, crossing, contract and signing receipts, checked September 7, 2026. Exact proof classes and limits appear in chapters 01–09; no fresh network, renderer or cross-engine acceptance test is claimed.
+- Open Spatial Lab source snapshot and retained local numerical, crossing, contract and signing receipts, rechecked September 11, 2026. Exact proof classes and limits appear in chapters 01–09; no fresh network, renderer or cross-engine acceptance test is claimed.
 
 ## Change log
 

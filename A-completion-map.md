@@ -1,5 +1,7 @@
 # Appendix A: Implementation and Proposal Map
 
+The September 11 architecture revision preserves this historical register's identifiers and counting unit. It expands the contracts in [chapter 03](03-portable-user-state-and-identity.md), [chapter 05](05-presence-live-sync-and-persistence.md), [06](06-discovery-and-addressing.md), [07](07-assets-and-the-render-seam.md), [08](08-composition-graph-schema-fixes.md), [09](09-conformance-vocabulary-and-errata.md), and [the whole-system map in chapter 10](10-role-and-blind-spots.md#the-whole-architecture-and-its-connections). Those additions cover stationary and distributed entities, client behavior, ongoing interaction, scoped authority and persistence. This register is a selected index, not an exhaustive specification for the whole architecture; proposed new acceptance cases are not historical test results.
+
 
 This selected inventory retains 73 historical surface identifiers across ten stages of the Web of Worlds journey. It includes canonical provisions, local interpretations, implementation extensions and open proposals. It is not a count of normative requirements, completed interoperability tests or all declarations in the publications.
 

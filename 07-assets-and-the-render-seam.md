@@ -168,6 +168,27 @@ This candidate transclusion profile requires a document address and known local 
 
 Proposed scope statement: WoW defines the agreed interchange behavior; rendering, physics, audio and input mechanisms remain implementation choices unless a named profile requires a specific observable result. Existing standards may be referenced for those domains after the group chooses the boundary. This report does not claim that a keyword search proves the architecture excludes them, or that one library provides every required binding.
 
+## Client rendering and behavior contract
+
+A client does more than draw an arriving visitor. It continuously resolves a composition, interprets its content, gathers input, requests actions and reflects accepted updates. A useful contract covers a stationary object for the entire time it is present. The following is a proposed profile boundary, extending the published content-profile intent; it is not a new claim that the pinned API specifies these behaviors.
+
+| Client responsibility | Required agreement for a selected profile | Observable acceptance case |
+|---|---|---|
+| Resolve and place | Resource identity, revision, frame, transform direction and dependency limits | Two clients place an asymmetric object with the agreed scale, orientation and error tolerance. |
+| Present content | Supported representation and capabilities, with a defined alternative or refusal | A client lacking an essential capability reports it; a permitted fallback preserves the agreed meaning. |
+| Interpret behavior | Behavior identifier/version, supported actions, inputs and outputs | The same action addresses the same object operation in two clients. |
+| Request changes | Actor context and target authority; accepted, denied, conflict and unsupported outcomes | A denied action makes no authoritative change even if one client predicted it visually. |
+| Apply updates | Snapshot/revision relationship, interpolation policy and recovery boundary | A lost update is detected and repaired without applying a delta to an unrelated revision. |
+| Release resources | Unsubscribe, dispose, revoke and detach semantics | Removing an inclusion stops its live subscription and executable activity without deleting the source object. |
+
+Geometry interchange does not automatically carry an interaction model. A visually identical lever can have different meanings: change a local animation, send a machine command, or request an action from a game simulation. A profile must say which meaning applies. Input-device mappings can differ, but they must lead to the same defined action where that action is supported. People using keyboard, controller or assistive input should receive a stated supported path and a clear result; a serialized preference alone does not establish accessible operation.
+
+Physics, animation, audio and clocks are separate capability questions. A profile can reference a content standard for animation and a session protocol for authoritative motion, then state which result matters. Two clients need not produce identical pixels or use the same renderer. They do need to agree on consequential outcomes such as whether a solid object blocks an action, whether an interaction was accepted, and which state revision is being presented. If exact simulation equivalence is required, that narrower profile must define its model and timing; the report does not assume it.
+
+Executable content needs an explicit host interface: allowed inputs and outputs, lifecycle calls, available services, resource limits and permission changes. A signed subtree cannot gain network, storage or scene-write authority solely through signature verification. A static asset fallback must not retain the appearance of an enabled action that the client cannot perform. The profile should state whether it disables that action with an explanation, substitutes an agreed behavior or refuses the content.
+
+The client may choose camera-relative coordinates, origin rebasing, depth composition, prediction and interpolation. Those choices remain local while their stated spatial and behavioral results pass the selected tests. This preserves the report's distinction between a shared outcome and a required rendering pipeline. [Chapter 05](05-presence-live-sync-and-persistence.md#ongoing-operation-actions-authority-and-durable-state) defines the corresponding action, state and recovery obligations; [chapter 04](04-provenance-and-signed-subtrees.md) keeps signed content and execution permission separate.
+
 ## Adoption path
 
 **Existing worlds.** Current media negotiation and node assets remain valid. The static-mesh baseline is a candidate optional profile with an explicit supported-content scope. Adding required data or restricting formats in the base API would need a separate compatibility decision.

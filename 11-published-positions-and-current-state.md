@@ -4,7 +4,7 @@ Web of Worlds has a substantial published architecture. Its current machine-read
 
 This comparison reads the complete named publication set: the 33-page whitepaper, its separate executive-summary page, both Metaverse Standards Forum posts, the WebOfWorlds home page, and the specification at commit `d39a1a009aa4ef8fb6d14aa66d588cffb74c33de`. The source-by-source account below makes the coverage inspectable. It includes material that the earlier summary-based register missed.
 
-There are **76 active public-source comparison entries**. The original public identifiers 1–44 remain traceable; four repeated declarations are now aliases, and 36 entries, 45–80, supply the missing coverage. **Five meeting notes, G1–G5, remain separate context.** Thus the document retains 80 public identifiers, of which four are aliases, plus five meeting identifiers. These are units of this register, not a completeness percentage, a count of normative requirements, or a measure of working interoperability. The former split of 20 “specified,” 17 “named only” and 12 “aspirations” is retired.
+There are **76 active public-source comparison entries**. The original public identifiers 1–44 remain traceable; four repeated declarations are now aliases, and 36 entries, 45–80, supply the missing coverage. **G1–G5 remain reserved identifiers for non-public context, with no meeting content reproduced in this edition.** Thus the document retains 80 public identifiers, of which four are aliases, plus five meeting identifiers. These are units of this register, not a completeness percentage, a count of normative requirements, or a measure of working interoperability. The former split of 20 “specified,” 17 “named only” and 12 “aspirations” is retired.
 
 ## Status and source versions
 
@@ -21,6 +21,8 @@ Draft for working-group review, 2026-09-07. Proposals in the report are unadopte
 | Reference implementation | [simpleWorlds][SW] is context. Only its published README/API path declarations at `13d2cbea991e17df0b14857f11f693712e6171cb` are compared; implementation internals and conformance are not assessed. The earlier September 7 HEAD check returned `d2bda3e2e73097c6e36ae0fd65a935cb3064ce71`. That later revision does not silently replace the pinned example. |
 
 The [method and source record][M] gives capture hashes, tests, historical evidence and limits. Dates and version checks describe these sources at the stated time; they do not assert the current release status of every technology or implementation mentioned by a publisher.
+
+The September 11, 2026 refresh independently retrieved the named public sources again. WoWAPI HEAD still matches the cited pin; the paper, summary and home-page bytes match the retained September 7 captures. Both post HTML captures changed and their current article text was reread, including requirements and Next Steps; no claim of byte equality is made for those posts. [Method and Sources][M] records fresh hashes, repository heads and limits. The historical declaration identifiers and evidence classes are preserved. The new whole-architecture material expands the treating chapters rather than relabelling proposals as published behavior.
 
 ## What a comparison entry means
 
@@ -182,17 +184,9 @@ The complete bodies of these named sources were read, including the full paper's
 
 No substantive declaration in these reviewed source regions was intentionally excluded. Different granularity would change the entry count; the locators and grouped subclaims expose that choice. A newly located source or omitted distinct behavior should receive an explicit addition or alias rather than silently changing an existing identifier.
 
-## Meeting context, kept separate from public-source evidence
+## Reserved non-public identifiers
 
-G1–G5 retain their original identifiers for five discussion notes from the August 24, 2026 working-group meeting. They are paraphrases carried from the meeting record, not public specifications or proof that a proposed structure is operating. The transcript is not publicly cited here. No conclusion about absence of governance documents follows from searches of API fields.
-
-| ID | Recorded discussion and locator | Current comparison and question | Report treatment |
-|---|---|---|---|
-| G1 | Initiative hub within Forum infrastructure linking external projects; meeting record lines 109 and 605. | Public organizational context appears in entry 79. Confirm the operative charter, mandate and project relationship from a governance source. | [10, governance][R10]. |
-| G2 | Business council connecting developer communities and standards bodies; lines 141, 613 and 655. | A council is a governance proposal, not an omitted API operation. The record does not establish its current membership or authority. | [10, governance][R10]. |
-| G3 | External maintainer council and an unresolved relationship to the hub; lines 145–147. | Distinguish maintainers of code from the body setting standards. Request the current role/decision document; an API keyword count cannot answer this. | [10, governance][R10]. |
-| G4 | Open-source licensing and contributor agreement were discussed; line 157. | Repository licence terms, contribution agreements and `content.license` fields are separate matters. The meeting statement is not evidence of an executed contributor agreement for each project. | [10, governance and licensing][R10]. |
-| G5 | A contact connecting developer communities and standards organizations; line 213. | The public paper already describes liaison/adoption plans in entries 69–71 and 80. A named accountable contact and operating process require a current governance reference. | [10, responsibility][R10]. |
+G1–G5 retain their identifiers so earlier references remain traceable. This public report does not reproduce the private meeting notes or transcript material associated with them. They are excluded from the 76 active public-source entries and do not support a public-source claim. Published organizational context is covered by entries 69–71, 79 and 80. Current mandates, operating responsibility and agreements require their own authoritative governance sources.
 
 ## What this changes for the working group
 

@@ -255,6 +255,51 @@ UserPreferences:
 
 Rationale: the whitepaper describes portable preferences; the pinned manifest schema does not bind that vocabulary.
 
+## Ongoing operation: actions, authority and durable state
+
+The same contracts are needed when nobody crosses a portal. Consider a machine that stays in a shared workshop. Its geometry comes from one publisher, its current setting comes from a live service, and its maintenance record belongs to a durable store. A person or software actor can request a change while two clients view it. This is a proposed acceptance scenario, not another claim about the local demonstration.
+
+### Keep four kinds of state distinct
+
+| State | Example | Responsibility to bind |
+|---|---|---|
+| Published content | Mesh, appearance, authored behavior and initial placement | Publisher identifies the resource and revision; the consumer resolves dependencies and applies its permissions. |
+| Live state | Machine setting, object motion, current participants | An identified authority accepts changes and publishes ordered revisions within a declared scope. |
+| Durable state | Saved setting, ownership record, persistent object revision | A named service defines when a write survives a restart and how readers recover it. |
+| Client presentation | Camera, interpolation, hover, predicted motion | The client may update its view locally; that view is not evidence that a shared change was accepted or saved. |
+
+An object can remain stationary while its properties, rights or appearance change. A server can persist authored content without persisting every live motion sample. A bookmark preserves a request to return, not a snapshot of any of these states. The profile must name the guarantee for each operation instead of treating all three as “persistence.”
+
+### Proposed action contract
+
+For the workshop scenario, bind the target to a world/service, graph and object identifier plus a supported behavior version. An input such as “set speed” becomes an action request carrying the actor's authorization context, a request identifier and, where the operation needs it, the expected object revision. The receiving authority checks the action and parameters before changing state. It returns accepted, denied, unsupported or conflict under the selected profile; the names here describe outcomes, not new mandatory wire tokens.
+
+Acceptance must identify the resulting revision. If acceptance only queues work, the response must say so and provide a way to observe completion. A successful graph PUT does not by itself prove a domain action was authorized or a write became durable. HTTP conditional requests, including `If-Match`, can provide a precondition where the chosen service exposes a suitable validator; their semantics come from [RFC 9110, sections 13 and 15.5.13](https://www.rfc-editor.org/rfc/rfc9110.html#section-13). This is a candidate use of that mechanism, not a claim that the pinned WoW node route already supports it.
+
+Retries need an explicit rule. For a non-repeatable action, a duplicate request identifier must not silently repeat its effect. The authority may retain an outcome for a defined lifetime or provide a status query. If it cannot determine whether the action happened, it reports an uncertain outcome and directs resynchronization rather than claiming success. The contract must also define what happens after the deduplication window ends.
+
+### Proposed live-update contract
+
+The client first obtains a snapshot with an authority, object/graph identity and revision. A compatible subscription then establishes which changes follow that snapshot. State updates identify their scope and order; duplicate delivery, gaps and authority restarts have defined outcomes. An epoch or equivalent restart marker is needed if revision numbers can be reused. A client detects that it has lost continuity and obtains a new snapshot instead of applying a later delta to the wrong base.
+
+Interest management controls which objects or regions a client receives. It must distinguish an object leaving the subscription from the object being deleted. When the client returns to that region, it needs a current snapshot or valid replay point. Access changes apply to subscriptions as well as new requests. Revoking a read permission cannot recall bytes already delivered, but it can end future delivery under a defined rule.
+
+Transport and meaning are separate decisions. WebSocket, event streams, polling or a specialist session service can deliver updates. A selected profile still needs common discovery, revision, replay, resynchronization and authorization semantics. A transport connection remaining open does not establish that the client holds the current object state.
+
+### Distributed authority and persistence
+
+Each mutable property or operation needs an accountable authority. The authority can be implemented by one server or a distributed service; this proposal does not choose its internal replication algorithm. A remote object included in another world's graph does not become writable by the including world merely because it is visible there. The including world may own the placement transform while the remote service owns the object's internal state. A cached copy is not a second authority.
+
+For two simultaneous edits, a profile must select a rule such as rejecting a stale precondition, assigning exclusive control for an interval, or referencing a defined merge policy. It must name the conflict outcome and test both clients. Arrival time at a renderer, a wall-clock timestamp or the last displayed frame is not a safe implied conflict rule.
+
+Durability requires a declared boundary: what is stored, which service acknowledges it, and what recovery returns after a process restart or disconnection. If an action spans services, state whether it is atomic or whether partial completion and compensation are visible. The base proposal makes no cross-service transaction guarantee. Deletion needs an identity/revision rule so stale updates cannot recreate an object accidentally; revocation, deletion, unlinking and temporary unavailability are different events.
+
+### Acceptance cases for this binding
+
+Two independently built clients observe one stationary object, then an authorized actor changes it. Both must resolve the same object identity and accepted revision while rendering their own presentation. A second edit based on the old revision must follow the selected conflict rule. A repeated action request must follow the selected duplicate rule. A dropped update must cause replay or resynchronization. A service restart must expose the promised durable result and a detectable revision boundary. A permission change must stop unauthorized new actions and future restricted updates. These are tests to build; none is satisfied by the retained portal or signing receipts.
+
+These requirements belong to the live-state and behavior profiles referenced by Web of Worlds. The working group should identify their owners and binding points; it need not prescribe a database, simulation engine or transport implementation. [Chapter 07](07-assets-and-the-render-seam.md#client-rendering-and-behavior-contract) covers the client side, and [chapter 08](08-composition-graph-schema-fixes.md#distributed-entities-and-reference-lifetime) covers object identity and references.
+
 ## Adoption path
 
 **Existing implementations.** These proposals do not change the base endpoint schemas. A chosen live-state or entry profile adds behavior that existing implementations may not support; it must be advertised and tested. Serving selected routes alone is not a new claim of full conformance.

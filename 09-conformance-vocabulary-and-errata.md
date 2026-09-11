@@ -217,6 +217,22 @@ Rationale: the publication supplies a useful typed example; an agreed grammar an
 
 ---
 
+## Behavioral coverage beyond portal traversal
+
+A useful initial program should cover three complementary scenarios. This is proposed acceptance work, not a statement that these tests have run. Each participating implementation declares exact source versions, a profile, supported capabilities and the obligations it accepts. Feature selection remains possible; an implementation claiming only static viewing need not claim a live-state or traversal profile.
+
+| Scenario | Main contracts exercised | Required observations and negative cases |
+|---|---|---|
+| Stationary distributed composition | Discovery, graph/object/instance identity, placement, representations and permissions | Two clients resolve one remote object and two instances of a shared asset; compare placement and meaning. Exercise namespace collision, unsupported content, denied read, stale reference and remote deletion. |
+| Ongoing shared operation | Action semantics, actor grant, state authority, live revisions, conflict and durability | An accepted action yields an identifiable state revision; a denied action does not. Exercise stale precondition, repeated request, dropped event, resync, authority restart and revoked grant. Verify the promised saved state after reconnect. |
+| Cross-world participation | Destination, portable envelope, frame conversion, admission, accepted items, presence and recovery | Use a VRM avatar, hat and hammer. Observe visual context, both presence records and granted authority separately. Exercise refused item, unsupported proof, unresolved destination and interrupted messages. |
+
+The report gives a complete architectural account of these selected contracts; the program still needs concrete fixtures and independent implementations to establish them. A passing local schema, signing or portal receipt cannot be reused as acceptance for an untested row. Where a service supplies no guarantee, report that limit instead of creating a stronger completion claim from a client's appearance.
+
+For each case, the corpus should publish the input, expected success/refusal or recovery, observation point, allowed tolerance and implementation/profile version. A negative case is useful only when a deliberate violation changes the verdict. Record what the authority accepted and what each client observed. Timing bounds, placement tolerances and durability promises must come from the selected profile, not from the incidental settings of the local demonstration.
+
+This test program instantiates the second of the five asks: behavioral conformance and shared tests. It does not add a sixth immediate adoption decision. Coordinate the graph and address fixtures with the scene/spatial decision, Earth-placement cases with the lan/lon migration, portal cases with optional destination binding, and signed executable cases with the optional subtree track. The normative owner for each specialist contract remains explicit in [chapter 10](10-role-and-blind-spots.md#specialist-interfaces-and-accountable-owners).
+
 ## Adoption path
 
 **Existing payloads.** Existing type constraints remain in force. Optional additions can preserve old payloads, but new required fields, exact transform lengths or identifier-type changes narrow compatibility. The example traversal schemas are opt-in profiles; requiring World.geoPose is not proposed as a universal fix.

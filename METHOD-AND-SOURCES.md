@@ -16,13 +16,13 @@ Each comparison starts with the publisher's actual position, including architect
 
 Searches helped locate material. A missing word was not used to prove missing architecture or behavior. Extra properties are permitted by the reviewed resource schemas, and existing type constraints can reject invalid data. `allOf` applies every member's constraints; it has no override order. These interpretations follow the [OpenAPI 3.0.4 Schema Object](https://spec.openapis.org/oas/v3.0.4.html#schema-object).
 
-## Named source set and versions
+## Named source set and September 7 baseline versions
 
 The [source-by-source account](11-published-positions-and-current-state.md#source-by-source-coverage-account) maps the complete bodies of the following sources. References linked from those works are background, not automatically additional publications in this comparison.
 
 | Source | Version and check |
 |---|---|
-| [Full whitepaper](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf) | March 31, 2026; 33 pages. September 7, 13:37 UTC PDF bytes match the earlier same-day substantive capture. SHA-256 `a43200294fb15ca6bfa80f93a1ee810eba2c010f76a88d39affde0cfd179110a`. All 33 pages were read. The source diagrams carrying world, graph, resolver and service relationships were checked visually; this revision rechecked pages 14, 17, 21, 22, 24 and 27. |
+| [Full whitepaper](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf) | March 31, 2026; 33 pages. September 7, 13:37 UTC PDF bytes match the earlier same-day substantive capture. SHA-256 `a43200294fb15ca6bfa80f93a1ee810eba2c010f76a88d39affde0cfd179110a`. All 33 pages were read. The source diagrams carrying world, graph, resolver and service relationships were checked visually; the September 7 revision rechecked pages 14, 17, 21, 22, 24 and 27. |
 | [Executive summary](https://webofworlds.github.io/initial_MSF_Whitepaper/) | Labelled 2026-Q1; distinct from the full paper. September 7, 13:37 UTC HTML SHA-256 `6d6f04018e186aa41a5ee3d305d96983dec06a20c0ea361ce5fa13cf7ee4da72`. Source repository HEAD was `988f369b0af206de0a7b53e7903dd55e08be80a0`. |
 | [Announcement post](https://metaverse-standards.org/news/blog/announcing-the-web-of-worlds-whitepaper-a-concrete-path-to-the-open-metaverse/) | Visible June 2, 2026; publication metadata `2026-06-03T01:40:32+00:00`. September 7, 13:37 UTC HTML SHA-256 `40155229ff087b6a2ac6bfb1f223dda33930cc7f6cbe78109d300425026664c7`. All article sections, including Next Steps, were read. |
 | [Linked Spatial Experiences post](https://metaverse-standards.org/news/blog/linked-spatial-experiences-the-web-of-worlds/) | April 2, 2025; metadata modified September 4, 2025. September 7, 13:37 UTC HTML SHA-256 `5446deb416ea2903640057b53d14d6860505df92ae439a16d2f9242aca73a7f9`. All requirement groups, examples and roadmap text were read. |
@@ -36,9 +36,35 @@ The September 7 home capture lists Open-Spatial-Lab among its world implementati
 
 The path comparison reads the [World README](https://github.com/WebOfWorlds/WoWAPI/blob/d39a1a009aa4ef8fb6d14aa66d588cffb74c33de/specification/OpenSpatialWorld/README.md#L17-L31), [paper p29](https://webofworlds.github.io/initial_MSF_Whitepaper/gen/MSF-3DWebInterop_WoWWhitepaper.pdf#page=29), and [simpleWorlds API](https://github.com/WebOfWorlds/simpleWorlds/blob/13d2cbea991e17df0b14857f11f693712e6171cb/packages/wow-spec/src/schema.yaml#L124-L228) as distinct source artifacts. All use `scene`; the canonical World YAML uses `spatial` and includes `spatialID`. This comparison reads declarations only. It makes no claim about simpleWorlds handler order, socket validation, persistence or runtime behavior.
 
+## September 11 source refresh and architecture revision
+
+Fresh checks on September 11, 2026 at 00:32–00:34 UTC retrieved 25 public source artifacts and five repository HEAD values. These establish the inspected versions. They do not test the implementations or verify a roadmap milestone. Initial Python HTTPS requests failed local certificate-chain verification; subsequent system-curl requests used normal TLS verification and succeeded. Failed transport attempts supply no source evidence.
+
+| Source | Fresh result |
+|---|---|
+| WoWAPI | HEAD remains `d39a1a009aa4ef8fb6d14aa66d588cffb74c33de`; the three API files and five READMEs were retrieved from main alongside that matching HEAD check. |
+| Whitepaper and summary | Source HEAD remains `988f369b0af206de0a7b53e7903dd55e08be80a0`. The PDF and summary hashes match the baseline table above. The existing substantive page comparison therefore remains applicable to those exact bytes. |
+| WebOfWorlds home | Source HEAD remains `6f14cd37823bd7c4c698f94a97893366e4dc07f3`; HTML SHA-256 remains `52af48d6e82b2f62d3055def154ead83c8e0b7190c130d6a44995c2ef675d3d4`. Implementation entries remain publisher declarations. |
+| Announcement post | Current HTML SHA-256 `6befd47130c2d7ce7c901c45824a65a21997e13c7cf42e7a4cd046317c800268`. Bytes differ from September 7. The current article, including Next Steps and roadmap language, was read against this report's source-by-source account. Its forward-looking language remains a published position, not proof of delivery. |
+| Linked Spatial Experiences post | Current HTML SHA-256 `02c8b291e19b8f19e3608637b902d612782ea08392c24988158265fb60e1ec48`. Bytes differ from September 7. The current principles, requirements, examples and roadmap were read against the comparison. Byte changes are recorded without assuming that only navigation changed. |
+| simpleWorlds | HEAD remains `d2bda3e2e73097c6e36ae0fd65a935cb3064ce71`. The older pinned README/API declarations remain the basis of the bounded path comparison; no implementation assessment is added. |
+| IWPS | Repository HEAD `f09c0da9e50a8dfe2e49e2266cf397973d41ba8a`; published Base Specification retrieved. It remains a candidate interface reference. |
+
+The refresh also retrieved the cited [Universal Manifest build documentation](https://universalmanifest.net/build/), [GeoPose 1.0 standard](https://docs.ogc.org/is/21-056r11/21-056r11.html), [glTF 2.0 specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html), [WebXR Anchors draft](https://immersive-web.github.io/anchors/), [Verifiable Credentials Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0/), [did:key method](https://w3c-ccg.github.io/did-key-spec/), [HTTP semantics](https://www.rfc-editor.org/rfc/rfc9110) and [BCP 14 clarification](https://www.rfc-editor.org/rfc/rfc8174). Publication status and scope differ: a draft, profile, format specification and project README are not interchangeable standards or implementation receipts. A Universal Manifest profile/version and its compatibility rules would need explicit agreement before adoption by reference.
+
+This revision compares the whole architecture across stationary and distributed entities, client rendering and behavior, ongoing interaction, live state, authority and persistence, human and software actors, discovery, placement and conformance. [Chapter 10](10-role-and-blind-spots.md#the-whole-architecture-and-its-connections) supplies the map and specialist responsibilities. Chapters 03 and 05–09 add the missing operating contracts and candidate acceptance cases. The stationary workshop and ongoing shared-operation scenarios are proposals; they were not implemented or executed by this document revision. The historical portal evidence retains its original scope.
+
+The runtime-comparison corpus and ecosystem entity documents were used as research indexes. Their coverage is unequal: read-only upstream analysis, bounded local checks and retained browser receipts establish different things. The corrected publication comparison in this report supersedes older descriptions that treated WoW as having no normative specification. A specialist's documented feature identifies a possible interface responsibility, not proven interoperability with WoW. No upstream clone was changed and no new architecture implementation is claimed.
+
+## September 11 document validation
+
+The retained OpenAPI 3.0 schema validator was also run against the current report using its preserved validation environment. It passed 26 schema fragments, 90 positive/negative instance cases, four GeoPose schema cases, four proposed longitude-conflict cases, three URI-resolution examples and the units-ratio example. It also verified the 73 selected surface rows, 25 historical findings and their retained status distribution. A first invocation in the default Python environment stopped before validation because its URI-format checker was unavailable; using the existing equipped environment resolved that setup problem without changing assertions or installing a new dependency.
+
+These are document/schema checks. They do not exercise an HTTP service, live-state recovery, cross-engine behavior, cryptographic trust or the new proposed scenarios. The historical implementation results below remain separately dated and bounded.
+
 ## Register units and coverage
 
-Document 11 contains **76 active public-source comparison entries**, retaining **80 public identifiers** and **four explicit aliases**. Original public identifiers 1–44 survive; additions are 45–80; aliases are 31→5, 32→19, 34→6 and 35→7. **Five meeting-context identifiers, G1–G5, retain their original names and remain separate.**
+Document 11 contains **76 active public-source comparison entries**, retaining **80 public identifiers** and **four explicit aliases**. Original public identifiers 1–44 survive; additions are 45–80; aliases are 31→5, 32→19, 34→6 and 35→7. **Five non-public context identifiers, G1–G5, retain their original names but contain no meeting material in this public edition.**
 
 An entry groups related subclaims when they share a binding question and evidence boundary. Distinct API operations and the five spatial-computing operators remain separate. These are comparison entries, not atomic requirements. The page/section account exposes the grouping and accounts for context such as bibliography entries. The former 49-row total mixed public entries and meeting notes; its 20/17/12 classification is retired.
 
@@ -46,7 +72,7 @@ The count does not measure standards completeness. The eleven chapters and two a
 
 ## Executed checks on September 7
 
-The checks below ran earlier on September 7. This revision read their retained outputs and rechecked load-bearing source text. It also checked declaration mapping, citation resolution, source hashes and report consistency. It did not rerun the successful behavior/signing suites or a live demonstration.
+The checks below ran earlier on September 7. Their retained outcomes were reconciled in the accepted September 7 content baseline. The September 11 revision preserves these limits and rechecks current public sources and document consistency; it does not claim a fresh execution of those behavior/signing suites or a live demonstration.
 
 | Check | Recorded outcome | Evidence boundary |
 |---|---|---|
@@ -77,11 +103,9 @@ The bounded probes recorded Node v22.22.3 and observation time `2026-09-07T12:21
 
 Signed-fabric refusal applies to its configured payload and trust anchor. The inspected portal path separately continues after a failed manifest result or arrival notification. Signature validity, trusted assertions, holder control, admission, execution permission and test receipts remain distinct. A capability flag is a declaration even when signed.
 
-## Meeting and ecosystem context
+## Ecosystem context and private evidence
 
-Meeting material from June 1, June 15, June 29, July 13 and August 24, 2026 informs discussion context. Document 11 preserves five August 24 governance notes separately from public declarations. They do not prove an adopted charter, executed agreement or absence of governance documents.
-
-An earlier topic table used keyword thresholds to label material “specified” or “discussed.” Its governance row totals **599 keyword hits across five transcripts**: 139 + 36 + 159 + 154 + 111. The recorded unit is matching transcript lines, not discussion events, elapsed time or a defensible ranking. Those labels and the governance superlative are not evidence here. No fresh semantic coding of the five transcripts is claimed.
+Private meeting records were not reanalysed for this revision and are not reproduced in the public report. G1–G5 remain reserved references only. Governance claims use published sources or remain open questions; private keyword counts and paraphrases supply no public-source evidence.
 
 The [infrastructure map](https://openspatials.com/msf/map) provides a useful comparison lens. Its selected 102 rows across six subjects describe that corpus. The retained classification has one “yes” (`net.address`), 17 “partial” and 84 “no” cells for WoW; these are labels in that map, not conformance verdicts. A blank cell does not establish worldwide absence, set priority or make WoW responsible for every concern. Adjacent projects retain different evidence levels; documentation about one project is not equivalent to an executed receipt for another.
 

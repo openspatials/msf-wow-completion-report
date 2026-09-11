@@ -248,6 +248,16 @@ be pursued.
 Rationale: a well-known HTTP resource can bootstrap service discovery from an origin. This is HTTP discovery using an origin that may be resolved through DNS, not DNS-level service discovery.
 
 
+## Discover services without confusing them with worlds
+
+A world address, graph resource, asset address, manifest resolver and live-session service answer different questions. Discovery must connect them explicitly. It must not infer that appending one path to the entry URL finds every service, or that a shared origin grants access to every resource. The existing API and README resources provide starting points; the following relationship is a candidate binding.
+
+An entry result should identify the world and the supported profile, then give resolvable references to the graph, available representations and the services needed by that profile. Each service reference needs its own base, supported version and access requirements. Resolve relative references under the named URI rules; preserve entry query and fragment meaning. A client that cannot discover a required live-state or action binding must report unsupported participation rather than treating a rendered snapshot as full support.
+
+Discovery does not itself authenticate a service, locate a physical anchor or grant action authority. Verify the reference through the selected trust/access rules, then obtain the frame and placement agreement described in [chapter 01](01-coordinate-precision-units-and-extents.md). When endpoints or capabilities change, the profile must define refresh and invalidation so clients do not keep acting through stale service references.
+
+A proposed acceptance case resolves one stationary external object whose content and live state are served separately, with a query-bearing entry URL and a relative asset reference. A second case makes the live-state service unavailable. The client should preserve the intended object and frame and expose exactly which interaction cannot continue. This tests useful discovery without requiring portal navigation.
+
 ## Adoption path
 
 **Existing worlds.** The canonical integer spatialID and existing URL entry examples remain supported. A string-id wire profile must define numeric-id migration/mapping; changing a path-parameter type is not automatically compatible. Query-bearing entry URLs remain valid.

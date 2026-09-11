@@ -190,6 +190,22 @@ A future external-node profile must specify identity/resolution, source and targ
 Rationale: this supplies one possible binding for the Data Inline and external-node architecture already published on whitepaper pages 21–22. Open Spatial Lab's independently verified fabric is a local candidate; generic external-node, asset and executable-document cases must remain distinct.
 
 
+## Distributed entities and reference lifetime
+
+A composition can include a building that never moves, a remote machine whose setting changes, and an animated asset with locally evaluated behavior. Their placement in one graph does not give them one storage location, update authority or lifetime. The whitepaper's live internal/external references motivate these distinctions; the binding below is proposed.
+
+**Identity.** Resolve a node within an explicit world/service and graph namespace. Preserve canonical numeric node IDs inside that namespace; do not change the base type to solve cross-world uniqueness. Two services can both have node 7. A reference must retain enough namespace information to keep them distinct. A visible label, content URL or array index is not an implicit replacement for that identity.
+
+**Resource versus instance.** A content resource can appear in several scene instances. Each instance has its own placement and may have separate interaction state. Deduplicating a downloaded mesh must not merge those instances or their action targets. Conversely, two views of the same authoritative object must not create two objects merely because they use different representations.
+
+**Placement versus content authority.** The including world can own an attachment transform while the source owns the referenced branch. Define how the transforms compose, where the reference resolves, which revision is requested and who can change each part. A consumer does not acquire write authority through inclusion. Editing the host transform need not rewrite or invalidate the source's signed payload when the signature scope excludes that transform; [chapter 04](04-provenance-and-signed-subtrees.md) states the relevant signing boundary.
+
+**Pinned versus live reference.** A pinned reference asks for an identified revision. A live reference asks to follow changes under a stated update contract. A cache validator or digest can identify bytes without providing live-event ordering. If a live branch changes while its dependencies are being loaded, the consumer needs either an agreed consistent revision set or an explicit partial/stale result. The profile must not imply a globally atomic snapshot across independent services unless it defines and tests that guarantee.
+
+**Failure and lifetime.** Distinguish forbidden access, missing object, unsupported representation, temporary disconnection and deletion. A cached last-known view must remain distinguishable from current authoritative state. Cycles and repeated references need bounded traversal. Detaching an instance should release its subscriptions and execution resources; deleting the authoritative object is a different authorized action. Define how deletion or replacement is represented so that delayed updates cannot silently recreate the old object.
+
+The acceptance fixture should include two external services with the same numeric node ID, two instances sharing one mesh, a live property update, a denied edit, and a deleted remote object. Test identity, placement, state continuity and release independently. These proposed tests extend the graph discussion beyond serialization; no independent distributed-graph execution is claimed. [Chapter 05](05-presence-live-sync-and-persistence.md#ongoing-operation-actions-authority-and-durable-state) supplies the update/authority contract, and [chapter 06](06-discovery-and-addressing.md#discover-services-without-confusing-them-with-worlds) supplies the service-resolution boundary.
+
 ## Adoption path
 
 **Existing implementations.** Canonical embedded children, numeric identifiers and Spatial-descriptor responses remain the default. A flat internal store can serve them through an adapter. Optional negotiated forms do not authorize unsolicited incompatible responses to old clients.
